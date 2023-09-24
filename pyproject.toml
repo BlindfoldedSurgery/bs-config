@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "bs-config"
+description = "Config"
+version = "0.1.0"
+authors = ["BlindfoldedSurgery <team@blindfolded.surgery>"]
+license = "MIT"
+
+[project.urls]
+repository = "https://github.com/BlindfoldedSurgery/bs-config"
+
+[tool.poetry.dependencies]
+python = ">=3.10 <3.12"
+Deprecated = "^1.2.13"
+pendulum = "^2.0.0"
+pydantic = "^2.3.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.0.0"
+mypy = "^1.4.0"
+pytest = "^7.1.2"
+ruff = "0.0.291"
+types-Deprecated = "^1.2.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+extend-select = [
+    "I001",
+]
+
+[tool.ruff.isort]
+known-first-party = ["bs_config"]
