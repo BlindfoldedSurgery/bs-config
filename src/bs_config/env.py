@@ -1,4 +1,4 @@
-from typing import Iterable, cast, overload
+from typing import Iterable, Literal, cast, overload
 
 from dotenv import dotenv_values
 
@@ -13,7 +13,7 @@ class Env:
         key: str,
         *,
         default: str,
-        required: bool,
+        required: bool = False,
     ) -> str:
         pass
 
@@ -23,7 +23,7 @@ class Env:
         key: str,
         *,
         default: None = None,
-        required: bool = False
+        required: Literal[False] = False,
     ) -> str | None:
         pass
 
@@ -33,7 +33,7 @@ class Env:
         key: str,
         *,
         default: None = None,
-        required: bool = True
+        required: Literal[True],
     ) -> str:
         pass
 
@@ -56,6 +56,7 @@ class Env:
     def get_bool(
         self,
         key: str,
+        *,
         default: bool,
     ) -> bool:
         value = self._values.get(key)
@@ -66,7 +67,7 @@ class Env:
         if not stripped:
             return default
 
-        return stripped == "true"
+        return stripped in ("true", "True", "yes")
 
     @overload
     def get_int(
@@ -74,7 +75,7 @@ class Env:
         key: str,
         *,
         default: int,
-        required: bool,
+        required: bool = False,
     ) -> int:
         pass
 
@@ -84,7 +85,7 @@ class Env:
         key: str,
         *,
         default: None = None,
-        required: bool = False,
+        required: Literal[False] = False,
     ) -> int | None:
         pass
 
@@ -94,7 +95,7 @@ class Env:
         key: str,
         *,
         default: None = None,
-        required: bool = True,
+        required: Literal[True],
     ) -> int:
         pass
 
@@ -103,7 +104,7 @@ class Env:
         key: str,
         *,
         default: int | None = None,
-        required: bool = False
+        required: bool = False,
     ) -> int | None:
         value = self._values.get(key)
         if value is None or not value.strip():
@@ -115,10 +116,7 @@ class Env:
 
     @overload
     def get_int_list(
-        self,
-        key: str,
-        *,
-        default: list[int],
+        self, key: str, *, default: list[int], required: bool = False
     ) -> list[int]:
         pass
 
@@ -128,7 +126,7 @@ class Env:
         key: str,
         *,
         default: None = None,
-        required: bool = False,
+        required: Literal[False] = False,
     ) -> list[int] | None:
         pass
 
@@ -138,7 +136,7 @@ class Env:
         key: str,
         *,
         default: None = None,
-        required: bool = True,
+        required: Literal[True],
     ) -> list[int]:
         pass
 
@@ -168,6 +166,7 @@ def _remove_none_values(data: dict[str, str | None]) -> dict[str, str]:
 
 
 def _load_env(name: str | None) -> dict[str, str]:
+    # TODO: do we want to load .env always?
     if not name:
         return _remove_none_values(dotenv_values(".env"))
     else:
