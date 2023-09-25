@@ -12,11 +12,14 @@ repository = "https://github.com/BlindfoldedSurgery/bs-config"
 python = ">=3.10 <3.12"
 Deprecated = "^1.2.13"
 pendulum = "^2.0.0"
-python-dotenv = "^1.0.0"
+python-dotenv = { version = "^1.0.0", optional = true }
+
+[tool.poetry.extras]
+dotenv = ["python-dotenv"]
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.0.0"
-coverage = {extras = ["toml"], version = "^7.3.1"}
+coverage = { extras = ["toml"], version = "^7.3.1" }
 mypy = "^1.4.0"
 pytest = "^7.1.2"
 pytest-cov = "^4.1.0"

@@ -381,7 +381,7 @@ six = ">=1.5"
 name = "python-dotenv"
 version = "1.0.0"
 description = "Read key-value pairs from a .env file and set them as environment variables"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "python-dotenv-1.0.0.tar.gz", hash = "sha256:a8df96034aae6d2d50a4ebe8216326c61c3eb64836776504fcca410e5937a3ba"},
@@ -556,7 +556,10 @@ files = [
     {file = "wrapt-1.15.0.tar.gz", hash = "sha256:d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a"},
 ]
 
+[extras]
+dotenv = ["python-dotenv"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10 <3.12"
-content-hash = "7001132a134b7a08d52e4ae4b530eeec0ae2bfb874ff39bf7f2d964eda6f05a3"
+content-hash = "3d47bb913f3f019c8d63b6cec61f8834b8aac7f55079e4da157ef23508e3f264"

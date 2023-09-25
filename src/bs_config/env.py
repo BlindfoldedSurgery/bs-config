@@ -1,6 +1,6 @@
-from typing import Iterable, Literal, cast, overload
+from typing import Literal, cast, overload
 
-from dotenv import dotenv_values
+from typing_extensions import Self
 
 
 class Env:
@@ -297,31 +297,53 @@ class Env:
 
         return result
 
+    @classmethod
+    def load(
+        cls,
+        *,
+        include_env: bool = True,
+        include_default_dotenv: bool = False,
+        additional_dotenvs: list[str] | None = None,
+    ) -> Self:
+        """
+        Loads an Env instance.
 
-def _remove_none_values(data: dict[str, str | None]) -> dict[str, str]:
-    for key, value in data.items():
-        if value is None:
-            del data[key]
+        Precedence (highest to lowest): ``os.environ``, ``additional_dotenvs``, ``.env``
 
-    return cast(dict[str, str], data)
+        **Warning**: To use dotenv functionality, you must install the dotenv extra.
 
+        Args:
+            include_env: whether to include the ``os.environ`` variables
+            include_default_dotenv: whether to include the ``.env`` file (if it exists)
+            additional_dotenvs: a list of other ``.env`` files to include. This should
+            just be the prefix, so "test" for "test.env". Descending precedence (last
+            one wins a conflict).
+        """
+        values = {}
 
-def _load_env(name: str | None) -> dict[str, str]:
-    # TODO: do we want to load .env always?
-    if not name:
-        return _remove_none_values(dotenv_values(".env"))
-    else:
-        return _remove_none_values(dotenv_values(f".env.{name}"))
+        if include_default_dotenv or additional_dotenvs:
+            try:
+                from dotenv import dotenv_values
+            except ImportError as e:
+                raise RuntimeError("dotenv extra is not installed") from e
 
+            if include_default_dotenv:
+                values.update(dotenv_values(".env"))
 
-def load_env(names: Iterable[str]) -> Env:
-    result = {**_load_env(None)}
+            for additional_dotenv in additional_dotenvs or []:
+                values.update(dotenv_values(f"{additional_dotenv}.env"))
 
-    for name in names:
-        result.update(_load_env(name))
+        if include_env:
+            from os import environ
 
-    from os import environ
+            values.update(environ)
 
-    result.update(environ)
+        return cls(cls._remove_none_values(values))
 
-    return Env(result)
+    @staticmethod
+    def _remove_none_values(data: dict[str, str | None]) -> dict[str, str]:
+        for key, value in data.items():
+            if value is None:
+                del data[key]
+
+        return cast(dict[str, str], data)
