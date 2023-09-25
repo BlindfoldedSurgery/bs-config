@@ -9,15 +9,21 @@ def env() -> Env:
     return Env(
         {
             "string": "abc",
+            "string_trailing": " abc ",
             "int": "42",
+            "int_trailing": " 42 ",
             "empty": "",
             "blank": "  ",
         }
     )
 
 
-def test_get_string_value(env):
-    value = env.get_string("string")
+@pytest.mark.parametrize(
+    "key",
+    ["string", "string_trailing"],
+)
+def test_get_string_value(env, key):
+    value = env.get_string(key)
     assert value == "abc"
 
 
@@ -62,6 +68,8 @@ def test_get_string_value_required_with_default(env):
     [
         ("True", True),
         ("true", True),
+        ("true ", True),
+        (" true ", True),
         ("yes", True),
         ("no", False),
         ("false", False),
@@ -84,8 +92,12 @@ def test_get_empty_bool_value(value):
     assert value is True, f"Value '{value}' does not trigger default value"
 
 
-def test_get_int_value(env):
-    value = env.get_int("int")
+@pytest.mark.parametrize(
+    "key",
+    ["int", "int_trailing"],
+)
+def test_get_int_value(env, key):
+    value = env.get_int(key)
     assert value == 42
 
 
