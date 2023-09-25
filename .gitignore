@@ -4,6 +4,7 @@ __pycache__
 
 # Conventional directory for build output.
 build/
+dist/
 
 # IntelliJ IDEA
 .idea/

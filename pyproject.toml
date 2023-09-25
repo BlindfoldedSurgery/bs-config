@@ -4,6 +4,7 @@ description = "Config"
 version = "0.1.0"
 authors = ["BlindfoldedSurgery <team@blindfolded.surgery>"]
 license = "MIT"
+readme = "README.md"
 
 [project.urls]
 repository = "https://github.com/BlindfoldedSurgery/bs-config"
