@@ -1,6 +1,10 @@
 from typing import Literal, cast, overload
 
-from typing_extensions import Self
+try:
+    from typing import Self
+except ImportError:
+    # Python 3.10
+    from typing_extensions import Self
 
 
 class Env:
