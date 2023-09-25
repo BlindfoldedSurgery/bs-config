@@ -18,9 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: snok/install-poetry@v1
         with:
-          poetry-version: "1.6.1"
+          version: "1.6.1"
       - uses: actions/checkout@v4
       - run: poetry install
       - name: Check coding standards
@@ -37,9 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: snok/install-poetry@v1
         with:
-          poetry-version: "1.6.1"
+          version: "1.6.1"
       - uses: actions/checkout@v4
       - run: poetry install
       - name: Run tests
@@ -72,9 +72,9 @@ jobs:
       POETRY_HTTP_BASIC_PYPI_BS_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
     steps:
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
+        uses: snok/install-poetry@v1
         with:
-          poetry-version: "1.6.1"
+          version: "1.6.1"
       - uses: actions/checkout@v4
       - run: poetry install
       - name: Build project
