@@ -7,6 +7,18 @@ class Env:
     def __init__(self, values: dict[str, str]):
         self._values = values
 
+    def _get_stripped_value(self, key: str) -> str | None:
+        value = self._values.get(key)
+
+        if value is None:
+            return value
+
+        value = value.strip()
+        if not value:
+            return None
+
+        return value
+
     @overload
     def get_string(
         self,
@@ -44,8 +56,8 @@ class Env:
         default: str | None = None,
         required: bool = False,
     ) -> str | None:
-        value = self._values.get(key)
-        if value is None or not value.strip():
+        value = self._get_stripped_value(key)
+        if value is None:
             if default is None and required:
                 raise ValueError(f"Missing config value for {key}")
 
@@ -59,15 +71,11 @@ class Env:
         *,
         default: bool,
     ) -> bool:
-        value = self._values.get(key)
+        value = self._get_stripped_value(key)
         if value is None:
             return default
 
-        stripped = value.strip()
-        if not stripped:
-            return default
-
-        return stripped in ("true", "True", "yes")
+        return value in ("true", "True", "yes")
 
     @overload
     def get_int(
@@ -106,8 +114,8 @@ class Env:
         default: int | None = None,
         required: bool = False,
     ) -> int | None:
-        value = self._values.get(key)
-        if value is None or not value.strip():
+        value = self._get_stripped_value(key)
+        if value is None:
             if default is None and required:
                 raise ValueError(f"Missing config value for {key}")
             return default
@@ -147,9 +155,9 @@ class Env:
         default: list[int] | None = None,
         required: bool = False,
     ) -> list[int] | None:
-        values = self._values.get(key)
+        values = self._get_stripped_value(key)
 
-        if values is None or not values.strip():
+        if values is None:
             if default is None and required:
                 raise ValueError(f"Missing config value for {key}")
             return default
