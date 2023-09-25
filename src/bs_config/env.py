@@ -56,6 +56,18 @@ class Env:
         default: str | None = None,
         required: bool = False,
     ) -> str | None:
+        """
+        Get a string value. The value is stripped and blank values are treated as
+        missing.
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            The requested value, or the default value
+        """
         value = self._get_stripped_value(key)
         if value is None:
             if default is None and required:
@@ -71,6 +83,18 @@ class Env:
         *,
         default: bool,
     ) -> bool:
+        """
+        Get a bool value. The original string value is stripped, and then 'true',
+        'True', and 'yes' are treated as True. ALL other non-blank strings are treated
+        as False.
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to False
+
+        Returns:
+            The requested value, or the default value if the value is missing or blank.
+        """
         value = self._get_stripped_value(key)
         if value is None:
             return default
@@ -114,6 +138,21 @@ class Env:
         default: int | None = None,
         required: bool = False,
     ) -> int | None:
+        """
+        Get an int value.
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            The requested value, or the default value
+
+        Raises:
+            ValueError: 1) If the value is not a valid int. 2) If the value is missing,
+             the default is None, and required is True.
+        """
         value = self._get_stripped_value(key)
         if value is None:
             if default is None and required:
@@ -159,6 +198,23 @@ class Env:
         default: list[str] | None = None,
         required: bool = False,
     ) -> list[str] | None:
+        """
+        Gets a list of strings, splitting the original value by comma. For each value,
+        the same rules as for ``get_string`` apply. Blank values are discarded.
+
+        Note that a blank string is treated as a missing value, so it will trigger a
+        fallback to the default value. If you want an empty list, use "," (technically
+        a list of two blank values, but blank values are discarded).
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            a list of strings parsed from the value, or the default value
+
+        """
         values = self._get_stripped_value(key)
 
         if values is None:
@@ -205,6 +261,22 @@ class Env:
         default: list[int] | None = None,
         required: bool = False,
     ) -> list[int] | None:
+        """
+        Gets a list of ints, splitting the original value by comma. For each value,
+        the same rules as for ``get_int`` apply. Blank values are discarded.
+
+        Note that a blank string is treated as a missing value, so it will trigger a
+        fallback to the default value. If you want an empty list, use "," (technically
+        a list of two blank values, but blank values are discarded).
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            a list of ints parsed from the value, or the default value
+        """
         values = self._get_stripped_value(key)
 
         if values is None:

@@ -51,6 +51,7 @@ def test_get_string_missing_no_default_required(env, key):
     [
         None,
         "test",
+        "",
     ],
 )
 def test_get_string_value_default(env, default):
