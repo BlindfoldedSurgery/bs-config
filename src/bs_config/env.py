@@ -1,7 +1,7 @@
 from typing import Literal, cast, overload
 
 try:
-    from typing import Self
+    from typing import Self  # type: ignore
 except ImportError:
     # Python 3.10
     from typing_extensions import Self
