@@ -325,7 +325,9 @@ class Env:
             try:
                 from dotenv import dotenv_values
             except ImportError as e:
-                raise RuntimeError("dotenv extra is not installed") from e
+                raise RuntimeError(
+                    "dotenv extra is not installed! Use bs-config[dotenv]."
+                ) from e
 
             if include_default_dotenv:
                 values.update(dotenv_values(".env"))
