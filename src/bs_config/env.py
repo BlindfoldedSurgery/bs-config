@@ -123,8 +123,58 @@ class Env:
         return int(value)
 
     @overload
+    def get_string_list(
+        self,
+        key: str,
+        *,
+        default: list[str],
+        required: bool = False,
+    ) -> list[str]:
+        pass
+
+    @overload
+    def get_string_list(
+        self,
+        key: str,
+        *,
+        default: None = None,
+        required: Literal[False] = False,
+    ) -> list[str] | None:
+        pass
+
+    @overload
+    def get_string_list(
+        self,
+        key: str,
+        *,
+        default: None = None,
+        required: Literal[True],
+    ) -> list[str]:
+        pass
+
+    def get_string_list(
+        self,
+        key: str,
+        *,
+        default: list[str] | None = None,
+        required: bool = False,
+    ) -> list[str] | None:
+        values = self._get_stripped_value(key)
+
+        if values is None:
+            if default is None and required:
+                raise ValueError(f"Missing config value for {key}")
+            return default
+
+        return [stripped for value in values.split(",") if (stripped := value.strip())]
+
+    @overload
     def get_int_list(
-        self, key: str, *, default: list[int], required: bool = False
+        self,
+        key: str,
+        *,
+        default: list[int],
+        required: bool = False,
     ) -> list[int]:
         pass
 
