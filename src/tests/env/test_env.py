@@ -126,3 +126,55 @@ def test_get_int_value_required_with_default(env):
 def test_get_int_value_required_no_default(env):
     with pytest.raises(ValueError, match="MISSING_KEY"):
         env.get_int("MISSING_KEY", default=None, required=True)
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (",", []),
+        (" ,", []),
+        (", ", []),
+        ("a,bc,d", ["a", "bc", "d"]),
+        (",a,bc,,d,", ["a", "bc", "d"]),
+        (" a , bc , d ", ["a", "bc", "d"]),
+        ("a,hello world,b", ["a", "hello world", "b"]),
+        ("1,2,34", ["1", "2", "34"]),
+    ],
+)
+def test_get_string_list(value, expected):
+    key = "KEY"
+    env = Env({key: value})
+    result = env.get_string_list(key)
+
+    assert result == expected, f"'{value}' is not parsed as {expected}"
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", " "],
+)
+def test_get_string_list_blank(value):
+    key = "KEY"
+    env = Env({key: value})
+    result = env.get_string_list(key)
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", " "],
+)
+def test_get_string_list_blank_required(value):
+    key = "KEY"
+    env = Env({key: value})
+    with pytest.raises(ValueError, match=key):
+        env.get_string_list(key, required=True)
+
+
+@pytest.mark.parametrize(
+    "required",
+    [True, False],
+)
+def test_get_string_list_default(env, required):
+    value = env.get_string_list("missing", default=["test"], required=required)
+    assert value == ["test"]
