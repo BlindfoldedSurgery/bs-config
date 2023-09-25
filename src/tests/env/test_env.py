@@ -134,6 +134,7 @@ def test_get_int_value_required_no_default(env):
         (",", []),
         (" ,", []),
         (", ", []),
+        ("test", ["test"]),
         ("a,bc,d", ["a", "bc", "d"]),
         (",a,bc,,d,", ["a", "bc", "d"]),
         (" a , bc , d ", ["a", "bc", "d"]),
@@ -160,6 +161,13 @@ def test_get_string_list_blank(value):
     assert result is None
 
 
+def test_get_string_list_missing_required():
+    key = "KEY"
+    env = Env({})
+    with pytest.raises(ValueError, match=key):
+        env.get_string_list(key, required=True)
+
+
 @pytest.mark.parametrize(
     "value",
     ["", " "],
@@ -178,3 +186,78 @@ def test_get_string_list_blank_required(value):
 def test_get_string_list_default(env, required):
     value = env.get_string_list("missing", default=["test"], required=required)
     assert value == ["test"]
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (",", []),
+        (" ,", []),
+        (", ", []),
+        ("1234", [1234]),
+        ("1,23,4", [1, 23, 4]),
+        (",1,23,,4,", [1, 23, 4]),
+        (" 1 , 23 , 4 ", [1, 23, 4]),
+    ],
+)
+def test_get_int_list(value, expected):
+    key = "KEY"
+    env = Env({key: value})
+    result = env.get_int_list(key)
+
+    assert result == expected, f"'{value}' is not parsed as {expected}"
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", " "],
+)
+def test_get_int_list_blank(value):
+    key = "KEY"
+    env = Env({key: value})
+    result = env.get_int_list(key)
+    assert result is None
+
+
+def test_get_int_list_missing_required():
+    key = "KEY"
+    env = Env({})
+    with pytest.raises(ValueError, match=key):
+        env.get_int_list(key, required=True)
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", " "],
+)
+def test_get_int_list_blank_required(value):
+    key = "KEY"
+    env = Env({key: value})
+    with pytest.raises(ValueError, match=key):
+        env.get_int_list(key, required=True)
+
+
+@pytest.mark.parametrize(
+    "required",
+    [True, False],
+)
+def test_get_int_list_default(env, required):
+    value = env.get_int_list("missing", default=[42], required=required)
+    assert value == [42]
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        "a",
+        " test ",
+        "1,b,3",
+        ",a,",
+        "1 2",
+    ],
+)
+def test_get_int_list_invalid_value(value):
+    key = "KEY"
+    env = Env({key: value})
+    with pytest.raises(ValueError, match=key):
+        env.get_int_list(key)

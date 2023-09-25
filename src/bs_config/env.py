@@ -212,7 +212,18 @@ class Env:
                 raise ValueError(f"Missing config value for {key}")
             return default
 
-        return [int(value) for value in values.split(",")]
+        result: list[int] = []
+        for value in values.split(","):
+            stripped = value.strip()
+            if not stripped:
+                continue
+
+            try:
+                result.append(int(stripped))
+            except ValueError:
+                raise ValueError(f"Invalid integer for key {key}: '{value}'")
+
+        return result
 
 
 def _remove_none_values(data: dict[str, str | None]) -> dict[str, str]:
