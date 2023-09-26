@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bs-config"
 description = "Config"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["BlindfoldedSurgery <team@blindfolded.surgery>"]
 license = "MIT"
 readme = "README.md"
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/BlindfoldedSurgery/bs-config"
 
 [tool.poetry.dependencies]
-python = ">=3.10 <3.12"
+python = ">=3.11 <3.12"
 python-dotenv = { version = "^1.0.0", optional = true }
 
 [tool.poetry.extras]

@@ -13,7 +13,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        pyversion: [ "3.11", "3.10" ]
+        pyversion: [ "3.11" ]
     container: python:${{ matrix.pyversion }}-slim
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
   test:
     strategy:
       matrix:
-        pyversion: [ "3.11", "3.10" ]
+        pyversion: [ "3.11" ]
     container: python:${{ matrix.pyversion }}-slim
     runs-on: ubuntu-latest
     steps:
@@ -58,7 +58,7 @@ jobs:
 
   publish_package:
     runs-on: ubuntu-latest
-    container: python:3.10-slim
+    container: python:3.11-slim
     needs:
       - lint
       - test
