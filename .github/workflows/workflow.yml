@@ -8,6 +8,7 @@ on:
 
 env:
   COVERAGE_VERSION: "3.11"
+  MIN_VERSION: "3.11"
 
 jobs:
   lint:
@@ -58,7 +59,7 @@ jobs:
 
   publish_package:
     runs-on: ubuntu-latest
-    container: python:3.11-slim
+    container: python:${{ env.MIN_VERSION }}-slim
     needs:
       - lint
       - test
