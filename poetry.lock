@@ -346,5 +346,5 @@ dotenv = ["python-dotenv"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.11 <3.12"
-content-hash = "e22269b167d431bcb5939a81aaf387d3b15ac157d56185c26cf1b12447f54d75"
+python-versions = ">=3.11 <3.13"
+content-hash = "dca148e1e0cbde4e64fc7bf9e778562a67635dc398690fd2fc1704b5695fa4e6"
