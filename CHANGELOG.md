@@ -5,6 +5,9 @@
 ### Breaking Changes
 
 - Dropped Python 3.10 support
+
+### New
+
 - Support Python 3.12
 
 ## 0.1.1
