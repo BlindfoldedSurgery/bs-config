@@ -27,7 +27,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish_package:
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v0
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/publish-package.yml@v0
     needs:
       - lint
       - test
