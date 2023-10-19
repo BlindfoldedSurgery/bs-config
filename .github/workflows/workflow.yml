@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         pyversion: [ "3.11", "3.12" ]
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v0
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v1
     with:
       python-version: ${{ matrix.pyversion }}
 
@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         pyversion: [ "3.11", "3.12" ]
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v0
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v1
     with:
       python-version: ${{ matrix.pyversion }}
       submit-coverage: ${{ matrix.pyversion == '3.11' }}
@@ -27,7 +27,7 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish_package:
-    uses: BlindfoldedSurgery/actions-python/.github/workflows/publish-package.yml@v0
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/publish-package.yml@v1
     needs:
       - lint
       - test
