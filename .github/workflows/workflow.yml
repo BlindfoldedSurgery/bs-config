@@ -22,30 +22,12 @@ jobs:
     strategy:
       matrix:
         pyversion: [ "3.11", "3.12" ]
-    container: python:${{ matrix.pyversion }}-slim
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Poetry
-        run: pip install poetry==1.6.1
-      - uses: actions/checkout@v4
-      - run: poetry install --all-extras
-      - name: Run tests
-        run: |
-          if [ "${{ matrix.pyversion }}" = "${{ env.COVERAGE_VERSION }}" ]
-          then
-            poetry run pytest --cov src/
-          else
-            poetry run pytest src/
-          fi
-      - name: Convert Python coverage file format to XML
-        if: matrix.pyversion == env.COVERAGE_VERSION
-        run: poetry run coverage xml
-      - name: Upload coverage reports to Codecov
-        if: matrix.pyversion == env.COVERAGE_VERSION
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v0
+    with:
+      python-version: ${{ matrix.pyversion }}
+      submit-coverage: ${{ matrix.pyversion == env.COVERAGE_VERSION }}
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish_package:
     runs-on: ubuntu-latest
