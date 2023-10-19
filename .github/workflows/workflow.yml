@@ -6,9 +6,6 @@ on:
       - v**
   pull_request: { }
 
-env:
-  COVERAGE_VERSION: "3.11"
-
 jobs:
   lint:
     strategy:
@@ -25,7 +22,7 @@ jobs:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v0
     with:
       python-version: ${{ matrix.pyversion }}
-      submit-coverage: ${{ matrix.pyversion == env.COVERAGE_VERSION }}
+      submit-coverage: ${{ matrix.pyversion == '3.11' }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
