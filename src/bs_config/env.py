@@ -1,21 +1,20 @@
-from typing import Literal, Self, cast, overload
+from __future__ import annotations
+
+import abc
+from typing import Literal, cast, overload
 
 
-class Env:
-    def __init__(self, values: dict[str, str]):
-        self._values = values
+class Env(abc.ABC):
+    @abc.abstractmethod
+    def scoped(self, prefix: str) -> Env:
+        """
+        Args:
+            prefix: the prefix to cut off for the scoped instance
 
-    def _get_stripped_value(self, key: str) -> str | None:
-        value = self._values.get(key)
-
-        if value is None:
-            return value
-
-        value = value.strip()
-        if not value:
-            return None
-
-        return value
+        Returns:
+            an instance with all key starting with the prefix, now without that prefix
+        """
+        pass
 
     @overload
     def get_string(
@@ -47,6 +46,7 @@ class Env:
     ) -> str:
         pass
 
+    @abc.abstractmethod
     def get_string(
         self,
         key: str,
@@ -66,15 +66,9 @@ class Env:
         Returns:
             The requested value, or the default value
         """
-        value = self._get_stripped_value(key)
-        if value is None:
-            if default is None and required:
-                raise ValueError(f"Missing config value for {key}")
+        pass
 
-            return default
-
-        return value
-
+    @abc.abstractmethod
     def get_bool(
         self,
         key: str,
@@ -93,11 +87,7 @@ class Env:
         Returns:
             The requested value, or the default value if the value is missing or blank.
         """
-        value = self._get_stripped_value(key)
-        if value is None:
-            return default
-
-        return value in ("true", "True", "yes")
+        pass
 
     @overload
     def get_int(
@@ -129,6 +119,7 @@ class Env:
     ) -> int:
         pass
 
+    @abc.abstractmethod
     def get_int(
         self,
         key: str,
@@ -151,13 +142,7 @@ class Env:
             ValueError: 1) If the value is not a valid int. 2) If the value is missing,
              the default is None, and required is True.
         """
-        value = self._get_stripped_value(key)
-        if value is None:
-            if default is None and required:
-                raise ValueError(f"Missing config value for {key}")
-            return default
-
-        return int(value)
+        pass
 
     @overload
     def get_string_list(
@@ -189,6 +174,7 @@ class Env:
     ) -> list[str]:
         pass
 
+    @abc.abstractmethod
     def get_string_list(
         self,
         key: str,
@@ -213,14 +199,7 @@ class Env:
             a list of strings parsed from the value, or the default value
 
         """
-        values = self._get_stripped_value(key)
-
-        if values is None:
-            if default is None and required:
-                raise ValueError(f"Missing config value for {key}")
-            return default
-
-        return [stripped for value in values.split(",") if (stripped := value.strip())]
+        pass
 
     @overload
     def get_int_list(
@@ -252,6 +231,7 @@ class Env:
     ) -> list[int]:
         pass
 
+    @abc.abstractmethod
     def get_int_list(
         self,
         key: str,
@@ -275,25 +255,7 @@ class Env:
         Returns:
             a list of ints parsed from the value, or the default value
         """
-        values = self._get_stripped_value(key)
-
-        if values is None:
-            if default is None and required:
-                raise ValueError(f"Missing config value for {key}")
-            return default
-
-        result: list[int] = []
-        for value in values.split(","):
-            stripped = value.strip()
-            if not stripped:
-                continue
-
-            try:
-                result.append(int(stripped))
-            except ValueError:
-                raise ValueError(f"Invalid integer for key {key}: '{value}'")
-
-        return result
+        pass
 
     @classmethod
     def load(
@@ -302,7 +264,7 @@ class Env:
         include_env: bool = True,
         include_default_dotenv: bool = False,
         additional_dotenvs: list[str] | None = None,
-    ) -> Self:
+    ) -> Env:
         """
         Loads an Env instance.
 
@@ -338,7 +300,19 @@ class Env:
 
             values.update(environ)
 
-        return cls(cls._remove_none_values(values))
+        return _BaseEnv(cls._remove_none_values(values))
+
+    @classmethod
+    def load_from_dict(
+        cls,
+        values: dict[str, str | None],
+    ) -> Env:
+        """
+        Loads an Env instance using the given values in a dict.
+        """
+        return _BaseEnv(
+            {key: value for key, value in values.items() if value is not None}
+        )
 
     @staticmethod
     def _remove_none_values(data: dict[str, str | None]) -> dict[str, str]:
@@ -347,3 +321,181 @@ class Env:
                 del data[key]
 
         return cast(dict[str, str], data)
+
+
+class _BaseEnv(Env):
+    def __init__(self, values: dict[str, str]):
+        self._values = values
+
+    def _get_stripped_value(self, key: str) -> str | None:
+        value = self._values.get(key)
+
+        if value is None:
+            return value
+
+        value = value.strip()
+        if not value:
+            return None
+
+        return value
+
+    def scoped(self, prefix: str) -> Env:
+        if not prefix:
+            return self
+
+        return _ScopedEnv(self, prefix)
+
+    def get_string(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: str | None = None,
+        required: bool = False,
+    ) -> str | None:
+        value = self._get_stripped_value(key)
+        if value is None:
+            if default is None and required:
+                raise ValueError(f"Missing config value for {key}")
+
+            return default
+
+        return value
+
+    def get_bool(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: bool,
+    ) -> bool:
+        value = self._get_stripped_value(key)
+        if value is None:
+            return default
+
+        return value in ("true", "True", "yes")
+
+    def get_int(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: int | None = None,
+        required: bool = False,
+    ) -> int | None:
+        value = self._get_stripped_value(key)
+        if value is None:
+            if default is None and required:
+                raise ValueError(f"Missing config value for {key}")
+            return default
+
+        return int(value)
+
+    def get_string_list(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: list[str] | None = None,
+        required: bool = False,
+    ) -> list[str] | None:
+        values = self._get_stripped_value(key)
+
+        if values is None:
+            if default is None and required:
+                raise ValueError(f"Missing config value for {key}")
+            return default
+
+        return [stripped for value in values.split(",") if (stripped := value.strip())]
+
+    def get_int_list(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: list[int] | None = None,
+        required: bool = False,
+    ) -> list[int] | None:
+        values = self._get_stripped_value(key)
+
+        if values is None:
+            if default is None and required:
+                raise ValueError(f"Missing config value for {key}")
+            return default
+
+        result: list[int] = []
+        for value in values.split(","):
+            stripped = value.strip()
+            if not stripped:
+                continue
+
+            try:
+                result.append(int(stripped))
+            except ValueError:
+                raise ValueError(f"Invalid integer for key {key}: '{value}'")
+
+        return result
+
+
+class _ScopedEnv(Env):
+    def __init__(self, parent: Env, prefix: str) -> None:
+        self.parent = parent
+        self.prefix = prefix
+
+    def scoped(self, prefix: str) -> Env:
+        return _ScopedEnv(self, prefix)
+
+    def get_string(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: str | None = None,
+        required: bool = False,
+    ) -> str | None:
+        return self.parent.get_string(
+            f"{self.prefix}{key}",
+            default=default,  # type: ignore[arg-type]
+            required=required,
+        )
+
+    def get_bool(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: bool,
+    ) -> bool:
+        return self.parent.get_bool(f"{self.prefix}{key}", default=default)
+
+    def get_int(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: int | None = None,
+        required: bool = False,
+    ) -> int | None:
+        return self.parent.get_int(
+            f"{self.prefix}{key}",
+            default=default,  # type: ignore[arg-type]
+            required=required,
+        )
+
+    def get_string_list(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: list[str] | None = None,
+        required: bool = False,
+    ) -> list[str] | None:
+        return self.parent.get_string_list(
+            f"{self.prefix}{key}",
+            default=default,  # type: ignore[arg-type]
+            required=required,
+        )
+
+    def get_int_list(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: list[int] | None = None,
+        required: bool = False,
+    ) -> list[int] | None:
+        return self.parent.get_int_list(
+            f"{self.prefix}{key}",
+            default=default,  # type: ignore[arg-type]
+            required=required,
+        )

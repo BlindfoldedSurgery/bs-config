@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0
+
+### Features
+
+- Allow scoping Env instances using `Env.scoped`
+
+### Breaking Changes
+
+- Replace Env constructor with `Env.load_from_dict` classmethod
+
 ## 0.2.0
 
 ### Breaking Changes

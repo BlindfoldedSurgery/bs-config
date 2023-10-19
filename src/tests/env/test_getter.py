@@ -6,7 +6,7 @@ from bs_config.env import Env
 
 @fixture
 def env() -> Env:
-    return Env(
+    return Env.load_from_dict(
         {
             "string": "abc",
             "string_trailing": " abc ",
@@ -78,7 +78,7 @@ def test_get_string_value_required_with_default(env):
     ],
 )
 def test_get_bool_value(key, expected):
-    env = Env({key: key})
+    env = Env.load_from_dict({key: key})
     value = env.get_bool(key, default=not expected)
     assert value == expected, f"Value '{key}' is not parsed as {expected}"
 
@@ -88,7 +88,7 @@ def test_get_bool_value(key, expected):
     ["", " "],
 )
 def test_get_empty_bool_value(value):
-    env = Env({"KEY": value})
+    env = Env.load_from_dict({"KEY": value})
     value = env.get_bool("KEY", default=True)
     assert value is True, f"Value '{value}' does not trigger default value"
 
@@ -145,7 +145,7 @@ def test_get_int_value_required_no_default(env):
 )
 def test_get_string_list(value, expected):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     result = env.get_string_list(key)
 
     assert result == expected, f"'{value}' is not parsed as {expected}"
@@ -157,14 +157,14 @@ def test_get_string_list(value, expected):
 )
 def test_get_string_list_blank(value):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     result = env.get_string_list(key)
     assert result is None
 
 
 def test_get_string_list_missing_required():
     key = "KEY"
-    env = Env({})
+    env = Env.load_from_dict({})
     with pytest.raises(ValueError, match=key):
         env.get_string_list(key, required=True)
 
@@ -175,7 +175,7 @@ def test_get_string_list_missing_required():
 )
 def test_get_string_list_blank_required(value):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     with pytest.raises(ValueError, match=key):
         env.get_string_list(key, required=True)
 
@@ -203,7 +203,7 @@ def test_get_string_list_default(env, required):
 )
 def test_get_int_list(value, expected):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     result = env.get_int_list(key)
 
     assert result == expected, f"'{value}' is not parsed as {expected}"
@@ -215,14 +215,14 @@ def test_get_int_list(value, expected):
 )
 def test_get_int_list_blank(value):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     result = env.get_int_list(key)
     assert result is None
 
 
 def test_get_int_list_missing_required():
     key = "KEY"
-    env = Env({})
+    env = Env.load_from_dict({})
     with pytest.raises(ValueError, match=key):
         env.get_int_list(key, required=True)
 
@@ -233,7 +233,7 @@ def test_get_int_list_missing_required():
 )
 def test_get_int_list_blank_required(value):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     with pytest.raises(ValueError, match=key):
         env.get_int_list(key, required=True)
 
@@ -259,6 +259,6 @@ def test_get_int_list_default(env, required):
 )
 def test_get_int_list_invalid_value(value):
     key = "KEY"
-    env = Env({key: value})
+    env = Env.load_from_dict({key: value})
     with pytest.raises(ValueError, match=key):
         env.get_int_list(key)
