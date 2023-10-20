@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+Same as 0.3.0.
+
 ## 0.3.0
 
 ### Features
