@@ -9,6 +9,8 @@ on:
 jobs:
   check-commits:
     uses: BlindfoldedSurgery/actions-actions/.github/workflows/commitizen-check.yml@v2
+    with:
+      python-version: '3.12'
 
   lint:
     strategy:
@@ -36,6 +38,8 @@ jobs:
       - test
     secrets:
       GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
+    with:
+      python-version: '3.12'
 
   publish_package:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/publish-package.yml@v1
