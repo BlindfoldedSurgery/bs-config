@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.1 (2023-12-17)
+
+### Fix
+
+- **deps**: update pre-commit hook commitizen-tools/commitizen to v3
+
 ## 1.0.0
 
 Same as 0.3.0.
