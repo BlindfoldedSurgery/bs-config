@@ -20,7 +20,7 @@ dotenv = ["python-dotenv"]
 black = "^23.0.0"
 commitizen = "^3.12.0"
 coverage = { extras = ["toml"], version = "^7.3.1" }
-mypy = "~1.7"
+mypy = "~1.8"
 pre-commit = "^3.5.0"
 pytest = "^7.1.2"
 pytest-cov = "^4.1.0"
