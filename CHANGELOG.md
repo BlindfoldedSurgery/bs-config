@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.2 (2024-06-22)
+
+### Fix
+
+- Ignore all cache folders
+
 ## v1.0.1 (2023-12-17)
 
 ### Fix
