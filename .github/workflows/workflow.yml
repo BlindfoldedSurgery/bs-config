@@ -13,12 +13,12 @@ jobs:
   check-commits:
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v2
     with:
-      python-version: '3.12'
+      python-version: '3.13'
 
   lint:
     strategy:
       matrix:
-        pyversion: [ "3.11", "3.12" ]
+        pyversion: [ "3.11", "3.12", "3.13" ]
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v2
     with:
       python-version: ${{ matrix.pyversion }}
@@ -26,7 +26,7 @@ jobs:
   test:
     strategy:
       matrix:
-        pyversion: [ "3.11", "3.12" ]
+        pyversion: [ "3.11", "3.12", "3.13" ]
     uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v2
     with:
       python-version: ${{ matrix.pyversion }}
@@ -42,7 +42,7 @@ jobs:
     secrets:
       GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
     with:
-      python-version: '3.12'
+      python-version: '3.13'
 
   publish_package:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/publish-package.yml@v2
