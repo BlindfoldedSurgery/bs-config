@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.0 (2024-10-18)
+
+### Feat
+
+- Support Python 3.13
+
 ## v1.0.2 (2024-06-22)
 
 ### Fix
