@@ -1,5 +1,3 @@
 [virtualenvs]
 in-project = true
 
-[repositories.pypi-bs]
-url = " https://pypi.bjoernpetersen.net/"
