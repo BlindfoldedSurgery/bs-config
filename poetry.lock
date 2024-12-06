@@ -152,13 +152,13 @@ files = [
 
 [[package]]
 name = "commitizen"
-version = "4.0.0"
+version = "4.1.0"
 description = "Python commitizen client tool"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "commitizen-4.0.0-py3-none-any.whl", hash = "sha256:52873ee589a64cf77fc55570dbd3f987c6ffcd33132d179eb625c4d06ae935f7"},
-    {file = "commitizen-4.0.0.tar.gz", hash = "sha256:16aff27e01b43015eab1c74eabbca3e284b4988dd1b146a0963282db241dc2c0"},
+    {file = "commitizen-4.1.0-py3-none-any.whl", hash = "sha256:2e6c5fbd442cab4bcc5a04bc86ef2196ef84bcf611317d6c596e87f5bb4c09f5"},
+    {file = "commitizen-4.1.0.tar.gz", hash = "sha256:4f2d9400ec411aec1c738d4c63fc7fd5807cd6ddf6be970869e03e68b88ff718"},
 ]
 
 [package.dependencies]
@@ -773,4 +773,4 @@ dotenv = ["python-dotenv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11 <3.14"
-content-hash = "6c2ba407e6712dbcb4aa37c347d2d58aebfc39ff672309dcbb24a8eb72a81723"
+content-hash = "3e8e8d35c44f0e997a33c4962953f334340dbcd8a6964352ad637eca1a580cff"
