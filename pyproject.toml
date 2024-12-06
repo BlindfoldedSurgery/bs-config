@@ -2,7 +2,7 @@
 requires-python = ">=3.11, <3.14"
 name = "bs-config"
 description = "Config"
-version = "1.1.0"
+version = "1.1.1"
 authors = [{ name = "BlindfoldedSurgery", email = "team@blindfolded.surgery" }]
 readme = "README.md"
 classifiers = [
