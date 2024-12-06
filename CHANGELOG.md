@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1 (2024-12-06)
+
+### Fix
+
+- Disable Python updates
+
 ## v1.1.0 (2024-10-18)
 
 ### Feat
