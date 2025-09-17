@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.2 (2025-09-17)
+
+### Fix
+
+- avoid removing keys from dict during iteration
+
 ## v1.1.1 (2024-12-06)
 
 ### Fix
