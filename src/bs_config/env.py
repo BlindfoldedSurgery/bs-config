@@ -316,9 +316,13 @@ class Env(abc.ABC):
 
     @staticmethod
     def _remove_none_values(data: dict[str, str | None]) -> dict[str, str]:
+        none_keys = []
         for key, value in data.items():
             if value is None:
-                del data[key]
+                none_keys.append(key)
+
+        for key in none_keys:
+            del data[key]
 
         return cast(dict[str, str], data)
 
