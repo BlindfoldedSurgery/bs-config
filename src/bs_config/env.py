@@ -140,7 +140,7 @@ class Env(abc.ABC):
 
         Raises:
             ValueError: 1) If the value is not a valid int. 2) If the value is missing,
-             the default is None, and required is True.
+                the default is None, and required is True.
         """
         pass
 
@@ -276,8 +276,8 @@ class Env(abc.ABC):
             include_env: whether to include the ``os.environ`` variables
             include_default_dotenv: whether to include the ``.env`` file (if it exists)
             additional_dotenvs: a list of other ``.env`` files to include. This should
-            just be the prefix, so "test" for "test.env". Descending precedence (last
-            one wins a conflict).
+                just be the prefix, so "test" for "test.env". Ascending precedence (last
+                one wins a conflict).
         """
         values = {}
 
