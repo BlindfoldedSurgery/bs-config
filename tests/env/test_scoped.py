@@ -1,9 +1,9 @@
-from _pytest.fixtures import fixture
+import pytest
 
 from bs_config.env import Env
 
 
-@fixture
+@pytest.fixture
 def env() -> Env:
     return Env.load_from_dict(
         {
