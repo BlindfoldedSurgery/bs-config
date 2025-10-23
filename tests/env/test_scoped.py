@@ -7,72 +7,73 @@ from bs_config.env import Env
 def env() -> Env:
     return Env.load_from_dict(
         {
-            "ALPHA_BETA_GAMMA": "abc",
-            "unrelated": "value",
+            "ALPHA__BETA_GAMMA": "abc",
+            "ALPHA__BETA__GAMMA": "def",
+            "UNRELATED": "value",
         }
     )
 
 
 def test_scoped_div(env):
-    scoped = env / "ALPHA"
-    assert scoped.get_string("BETA_GAMMA") == "abc"
+    scoped = env / "alpha"
+    assert scoped.get_string("beta-gamma") == "abc"
 
 
 def test_empty_prefix_scope(env):
-    scoped = env.scoped("")
-    assert scoped is env
+    with pytest.raises(ValueError):
+        env / ""
 
 
 def test_simple_scoped_get(env):
-    scoped = env.scoped("ALPHA_")
-    assert scoped.get_string("BETA_GAMMA") == "abc"
+    scoped = env / "alpha"
+    assert scoped.get_string("beta-gamma") == "abc"
     assert scoped.get_string("unrelated") is None
 
 
 def test_nested_scoped_get(env):
-    alpha = env.scoped("ALPHA_")
-    beta = alpha.scoped("BETA_")
-    assert beta.get_string("GAMMA") == "abc"
+    alpha = env / "alpha"
+    beta = alpha / "beta"
+    assert beta.get_string("gamma") == "def"
 
 
 def test_original_not_scoped(env):
-    scoped = env.scoped("ALPHA_")
+    scoped = env / "alpha"
     assert env.get_string("unrelated")
-    assert env.get_string("ALPHA_BETA_GAMMA")
-    assert scoped.get_string("BETA_GAMMA")
+    assert env.get_string("alpha.beta-gamma")
+    assert scoped.get_string("beta-gamma")
 
 
 def test_scoped_get_bool():
-    env = Env.load_from_dict({"ab": "True"})
-    scoped = env.scoped("a")
+    env = Env.load_from_dict({"A__B": "True"})
+    scoped = env / "a"
     assert scoped.get_bool("b", default=False) is True
 
 
 def test_scoped_get_int():
-    env = Env.load_from_dict({"ab": "42"})
-    scoped = env.scoped("a")
+    env = Env.load_from_dict({"A__B": "42"})
+    scoped = env / "a"
     assert scoped.get_int("b") == 42
 
 
 def test_scoped_get_string_list():
-    env = Env.load_from_dict({"ab": "a,b,c"})
-    scoped = env.scoped("a")
+    env = Env.load_from_dict({"A__B": "a,b,c"})
+    scoped = env / "a"
     assert scoped.get_string_list("b") == ["a", "b", "c"]
 
 
 def test_scoped_get_int_list():
-    env = Env.load_from_dict({"ab": "1,2,3"})
-    scoped = env.scoped("a")
+    env = Env.load_from_dict({"A__B": "1,2,3"})
+    scoped = env / "a"
     assert scoped.get_int_list("b") == [1, 2, 3]
 
 
 def test_get_string_transformed_value():
-    env = Env.load_from_dict({"ab": "1"})
-    integer = env.scoped("a").get_string("b", transform=int)
+    env = Env.load_from_dict({"A__B": "1"})
+    integer = (env / "a").get_string("b", transform=int)
     assert integer == 1
 
 
 def test_get_string_list_transformed_value():
-    env = Env.load_from_dict({"ab": "1,2,3"})
-    integers = env.scoped("a").get_string_list("b", transform=int)
+    env = Env.load_from_dict({"A__B": "1,2,3"})
+    integers = (env / "a").get_string_list("b", transform=int)
     assert integers == [1, 2, 3]

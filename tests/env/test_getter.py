@@ -7,19 +7,19 @@ from bs_config.env import Env
 def env() -> Env:
     return Env.load_from_dict(
         {
-            "string": "abc",
-            "string_trailing": " abc ",
-            "int": "42",
-            "int_trailing": " 42 ",
-            "empty": "",
-            "blank": "  ",
+            "STRING": "abc",
+            "STRING_TRAILING": " abc ",
+            "INT": "42",
+            "INT_TRAILING": " 42 ",
+            "EMPTY": "",
+            "BLANK": "  ",
         }
     )
 
 
 @pytest.mark.parametrize(
     "key",
-    ["string", "string_trailing"],
+    ["string", "string-trailing"],
 )
 def test_get_string_value(env, key):
     value = env.get_string(key)
@@ -38,7 +38,7 @@ def test_get_blank_string_default(env, key, default):
 
 @pytest.mark.parametrize(
     "key",
-    ["empty", "blank", "MISSING KEY"],
+    ["empty", "blank", "missing-key"],
 )
 def test_get_string_missing_no_default_required(env, key):
     with pytest.raises(ValueError, match=key):
@@ -64,7 +64,7 @@ def test_get_string_value_required_with_default(env):
 
 
 @pytest.mark.parametrize(
-    "key,expected",
+    "raw_value,expected",
     [
         ("True", True),
         ("true", True),
@@ -76,10 +76,10 @@ def test_get_string_value_required_with_default(env):
         ("unrelated", False),
     ],
 )
-def test_get_bool_value(key, expected):
-    env = Env.load_from_dict({key: key})
-    value = env.get_bool(key, default=not expected)
-    assert value == expected, f"Value '{key}' is not parsed as {expected}"
+def test_get_bool_value(raw_value, expected):
+    env = Env.load_from_dict({"KEY": raw_value})
+    value = env.get_bool("key", default=not expected)
+    assert value == expected, f"Value '{raw_value}' is not parsed as {expected}"
 
 
 @pytest.mark.parametrize(
@@ -88,13 +88,13 @@ def test_get_bool_value(key, expected):
 )
 def test_get_empty_bool_value(value):
     env = Env.load_from_dict({"KEY": value})
-    value = env.get_bool("KEY", default=True)
+    value = env.get_bool("key", default=True)
     assert value is True, f"Value '{value}' does not trigger default value"
 
 
 @pytest.mark.parametrize(
     "key",
-    ["int", "int_trailing"],
+    ["int", "int-trailing"],
 )
 def test_get_int_value(env, key):
     value = env.get_int(key)
@@ -124,8 +124,8 @@ def test_get_int_value_required_with_default(env):
 
 
 def test_get_int_value_required_no_default(env):
-    with pytest.raises(ValueError, match="MISSING_KEY"):
-        env.get_int("MISSING_KEY", default=None, required=True)
+    with pytest.raises(ValueError, match="missing-key"):
+        env.get_int("missing-key", default=None, required=True)
 
 
 @pytest.mark.parametrize(
@@ -143,9 +143,8 @@ def test_get_int_value_required_no_default(env):
     ],
 )
 def test_get_string_list(value, expected):
-    key = "KEY"
-    env = Env.load_from_dict({key: value})
-    result = env.get_string_list(key)
+    env = Env.load_from_dict({"KEY": value})
+    result = env.get_string_list("key")
 
     assert result == expected, f"'{value}' is not parsed as {expected}"
 
@@ -155,14 +154,13 @@ def test_get_string_list(value, expected):
     ["", " "],
 )
 def test_get_string_list_blank(value):
-    key = "KEY"
-    env = Env.load_from_dict({key: value})
-    result = env.get_string_list(key)
+    env = Env.load_from_dict({"KEY": value})
+    result = env.get_string_list("key")
     assert result is None
 
 
 def test_get_string_list_missing_required():
-    key = "KEY"
+    key = "key"
     env = Env.load_from_dict({})
     with pytest.raises(ValueError, match=key):
         env.get_string_list(key, required=True)
@@ -173,7 +171,7 @@ def test_get_string_list_missing_required():
     ["", " "],
 )
 def test_get_string_list_blank_required(value):
-    key = "KEY"
+    key = "key"
     env = Env.load_from_dict({key: value})
     with pytest.raises(ValueError, match=key):
         env.get_string_list(key, required=True)
@@ -201,9 +199,8 @@ def test_get_string_list_default(env, required):
     ],
 )
 def test_get_int_list(value, expected):
-    key = "KEY"
-    env = Env.load_from_dict({key: value})
-    result = env.get_int_list(key)
+    env = Env.load_from_dict({"KEY": value})
+    result = env.get_int_list("key")
 
     assert result == expected, f"'{value}' is not parsed as {expected}"
 
@@ -213,14 +210,13 @@ def test_get_int_list(value, expected):
     ["", " "],
 )
 def test_get_int_list_blank(value):
-    key = "KEY"
-    env = Env.load_from_dict({key: value})
-    result = env.get_int_list(key)
+    env = Env.load_from_dict({"KEY": value})
+    result = env.get_int_list("key")
     assert result is None
 
 
 def test_get_int_list_missing_required():
-    key = "KEY"
+    key = "key"
     env = Env.load_from_dict({})
     with pytest.raises(ValueError, match=key):
         env.get_int_list(key, required=True)
@@ -231,10 +227,9 @@ def test_get_int_list_missing_required():
     ["", " "],
 )
 def test_get_int_list_blank_required(value):
-    key = "KEY"
-    env = Env.load_from_dict({key: value})
-    with pytest.raises(ValueError, match=key):
-        env.get_int_list(key, required=True)
+    env = Env.load_from_dict({"KEY": value})
+    with pytest.raises(ValueError, match="key"):
+        env.get_int_list("key", required=True)
 
 
 @pytest.mark.parametrize(
@@ -257,8 +252,8 @@ def test_get_int_list_default(env, required):
     ],
 )
 def test_get_int_list_invalid_value(value):
-    key = "KEY"
-    env = Env.load_from_dict({key: value})
+    key = "key"
+    env = Env.load_from_dict({key.upper(): value})
     with pytest.raises(ValueError, match=key):
         env.get_int_list(key)
 
@@ -288,7 +283,7 @@ def test_get_string_transform_not_called_with_none(env, mocker):
 
 
 def test_get_string_list_transformed_value():
-    env = Env.load_from_dict({"foo": "1,2,3"})
+    env = Env.load_from_dict({"FOO": "1,2,3"})
     integers = env.get_string_list("foo", transform=int)
     assert integers == [1, 2, 3]
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import warnings
 from typing import TYPE_CHECKING, Literal, cast, overload
 from warnings import deprecated
 
@@ -358,8 +359,17 @@ class _BaseEnv(Env):
     def __init__(self, values: dict[str, str]):
         self._values = values
 
+    @staticmethod
+    def _to_screaming_snake_case(s: str) -> str:
+        return s.replace("-", "_").upper()
+
     def _get_stripped_value(self, key: str) -> str | None:
-        value = self._values.get(key)
+        if key != key.lower():
+            warnings.warn("Keys should use kebab-case")
+
+        key_parts = key.split(".")
+        full_key = "__".join(self._to_screaming_snake_case(part) for part in key_parts)
+        value = self._values.get(full_key)
 
         if value is None:
             return value
@@ -374,7 +384,7 @@ class _BaseEnv(Env):
         if not key:
             raise ValueError("Key cannot be empty")
 
-        return _ScopedEnv(self, f"{key}_")
+        return _ScopedEnv(self, key)
 
     @deprecated("Use / method for scoping")
     def scoped(self, prefix: str) -> Env:
@@ -490,7 +500,7 @@ class _ScopedEnv(Env):
         if not key:
             raise ValueError("Key cannot be empty")
 
-        return _ScopedEnv(self, f"{key}_")
+        return _ScopedEnv(self, key)
 
     @deprecated("Use / method for scoping")
     def scoped(self, prefix: str) -> Env:
@@ -505,7 +515,7 @@ class _ScopedEnv(Env):
         transform: Callable[[str], T] | None = None,
     ) -> T | None:
         return self.parent.get_string(
-            f"{self.prefix}{key}",
+            f"{self.prefix}.{key}",
             default=default,
             required=required,
             transform=transform,
@@ -517,7 +527,10 @@ class _ScopedEnv(Env):
         *,
         default: bool,
     ) -> bool:
-        return self.parent.get_bool(f"{self.prefix}{key}", default=default)
+        return self.parent.get_bool(
+            f"{self.prefix}.{key}",
+            default=default,
+        )
 
     def get_int(  # type: ignore[override]
         self,
@@ -527,7 +540,7 @@ class _ScopedEnv(Env):
         required: bool = False,
     ) -> int | None:
         return self.parent.get_int(
-            f"{self.prefix}{key}",
+            f"{self.prefix}.{key}",
             default=default,  # type: ignore[arg-type]
             required=required,
         )
@@ -541,7 +554,7 @@ class _ScopedEnv(Env):
         transform: Callable[[str], T] | None = None,
     ) -> list[T] | None:
         return self.parent.get_string_list(
-            f"{self.prefix}{key}",
+            f"{self.prefix}.{key}",
             default=default,  # type: ignore[arg-type]
             required=required,
             transform=transform,
@@ -555,7 +568,7 @@ class _ScopedEnv(Env):
         required: bool = False,
     ) -> list[int] | None:
         return self.parent.get_int_list(
-            f"{self.prefix}{key}",
+            f"{self.prefix}.{key}",
             default=default,  # type: ignore[arg-type]
             required=required,
         )
