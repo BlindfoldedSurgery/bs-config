@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.0.0 (2025-10-23)
+
+### BREAKING CHANGE
+
+- Env getters now expect a kebab-case key with scopes
+separated by dots. For values loaded from the process environment or a
+dotenv file, the keys will be translated to screaming snake case and
+scopes will be separated by a **double** underscore (`__`).
+
+
+- remove deprecated Env.scoped() method
+
 ## v2.0.0 (2025-10-23)
 
 ### BREAKING CHANGE
