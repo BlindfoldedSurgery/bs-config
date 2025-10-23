@@ -261,3 +261,27 @@ def test_get_int_list_invalid_value(value):
     env = Env.load_from_dict({key: value})
     with pytest.raises(ValueError, match=key):
         env.get_int_list(key)
+
+
+class _Stub:
+    pass
+
+
+def test_get_string_transformed_value(env):
+    integer = env.get_string("int", transform=int)
+    assert integer == 42
+
+
+def test_get_string_transformed_value__default(env, mocker):
+    mock = mocker.Mock()
+    default = _Stub()
+    value = env.get_string("invalid", transform=mock, default=default)
+    assert value is default
+    mock.assert_not_called()
+
+
+def test_get_string_transform_not_called_with_none(env, mocker):
+    mock = mocker.Mock()
+    value = env.get_string("invalid", transform=mock)
+    assert value is None
+    mock.assert_not_called()

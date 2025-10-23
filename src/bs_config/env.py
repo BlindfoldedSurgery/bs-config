@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import abc
-from typing import Literal, cast, overload
+from typing import TYPE_CHECKING, Literal, cast, overload
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class Env(abc.ABC):
@@ -17,43 +20,47 @@ class Env(abc.ABC):
         pass
 
     @overload
-    def get_string(
+    def get_string[T = str](
         self,
         key: str,
         *,
-        default: str,
+        default: T,
         required: bool = False,
-    ) -> str:
+        transform: Callable[[str], T] | None = None,
+    ) -> T:
         pass
 
     @overload
-    def get_string(
+    def get_string[T = str](
         self,
         key: str,
         *,
         default: None = None,
         required: Literal[False] = False,
-    ) -> str | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> T | None:
         pass
 
     @overload
-    def get_string(
+    def get_string[T = str](
         self,
         key: str,
         *,
         default: None = None,
         required: Literal[True],
-    ) -> str:
+        transform: Callable[[str], T] | None = None,
+    ) -> T:
         pass
 
     @abc.abstractmethod
-    def get_string(
+    def get_string[T = str](
         self,
         key: str,
         *,
-        default: str | None = None,
+        default: T | None = None,
         required: bool = False,
-    ) -> str | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> T | None:
         """
         Get a string value. The value is stripped and blank values are treated as
         missing.
@@ -62,6 +69,7 @@ class Env(abc.ABC):
             key: the key to look up
             default: a default value, defaults to None
             required: if True, a ValueError is raised instead of returning None
+            transform: a function to transform non-blank values
 
         Returns:
             The requested value, or the default value
@@ -349,13 +357,14 @@ class _BaseEnv(Env):
 
         return _ScopedEnv(self, prefix)
 
-    def get_string(  # type: ignore[override]
+    def get_string[T = str](
         self,
         key: str,
         *,
-        default: str | None = None,
+        default: T | None = None,
         required: bool = False,
-    ) -> str | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> T | None:
         value = self._get_stripped_value(key)
         if value is None:
             if default is None and required:
@@ -363,9 +372,12 @@ class _BaseEnv(Env):
 
             return default
 
-        return value
+        if transform is None:
+            return value
 
-    def get_bool(  # type: ignore[override]
+        return transform(value)
+
+    def get_bool(
         self,
         key: str,
         *,
@@ -377,7 +389,7 @@ class _BaseEnv(Env):
 
         return value in ("true", "True", "yes")
 
-    def get_int(  # type: ignore[override]
+    def get_int(
         self,
         key: str,
         *,
@@ -392,7 +404,7 @@ class _BaseEnv(Env):
 
         return int(value)
 
-    def get_string_list(  # type: ignore[override]
+    def get_string_list(
         self,
         key: str,
         *,
@@ -408,7 +420,7 @@ class _BaseEnv(Env):
 
         return [stripped for value in values.split(",") if (stripped := value.strip())]
 
-    def get_int_list(  # type: ignore[override]
+    def get_int_list(
         self,
         key: str,
         *,
@@ -444,20 +456,22 @@ class _ScopedEnv(Env):
     def scoped(self, prefix: str) -> Env:
         return _ScopedEnv(self, prefix)
 
-    def get_string(  # type: ignore[override]
+    def get_string[T = str](
         self,
         key: str,
         *,
-        default: str | None = None,
+        default: T | None = None,
         required: bool = False,
-    ) -> str | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> T | None:
         return self.parent.get_string(
             f"{self.prefix}{key}",
-            default=default,  # type: ignore[arg-type]
+            default=default,
             required=required,
+            transform=transform,
         )
 
-    def get_bool(  # type: ignore[override]
+    def get_bool(
         self,
         key: str,
         *,
@@ -465,7 +479,7 @@ class _ScopedEnv(Env):
     ) -> bool:
         return self.parent.get_bool(f"{self.prefix}{key}", default=default)
 
-    def get_int(  # type: ignore[override]
+    def get_int(
         self,
         key: str,
         *,
@@ -474,11 +488,11 @@ class _ScopedEnv(Env):
     ) -> int | None:
         return self.parent.get_int(
             f"{self.prefix}{key}",
-            default=default,  # type: ignore[arg-type]
+            default=default,
             required=required,
         )
 
-    def get_string_list(  # type: ignore[override]
+    def get_string_list(
         self,
         key: str,
         *,
@@ -487,11 +501,11 @@ class _ScopedEnv(Env):
     ) -> list[str] | None:
         return self.parent.get_string_list(
             f"{self.prefix}{key}",
-            default=default,  # type: ignore[arg-type]
+            default=default,
             required=required,
         )
 
-    def get_int_list(  # type: ignore[override]
+    def get_int_list(
         self,
         key: str,
         *,
@@ -500,6 +514,6 @@ class _ScopedEnv(Env):
     ) -> list[int] | None:
         return self.parent.get_int_list(
             f"{self.prefix}{key}",
-            default=default,  # type: ignore[arg-type]
+            default=default,
             required=required,
         )
