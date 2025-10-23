@@ -3,7 +3,6 @@ from __future__ import annotations
 import abc
 import warnings
 from typing import TYPE_CHECKING, Literal, cast, overload
-from warnings import deprecated
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -19,18 +18,6 @@ class Env(abc.ABC):
         Returns:
             an instance that is scoped to the given key
 
-        """
-        pass
-
-    @abc.abstractmethod
-    @deprecated("Use the / method for scoping")
-    def scoped(self, prefix: str) -> Env:
-        """
-        Args:
-            prefix: the prefix to cut off for the scoped instance
-
-        Returns:
-            an instance with all key starting with the prefix, now without that prefix
         """
         pass
 
@@ -386,13 +373,6 @@ class _BaseEnv(Env):
 
         return _ScopedEnv(self, key)
 
-    @deprecated("Use / method for scoping")
-    def scoped(self, prefix: str) -> Env:
-        if not prefix:
-            return self
-
-        return _ScopedEnv(self, prefix)
-
     def get_string[T = str](  # type: ignore[override]
         self,
         key: str,
@@ -501,10 +481,6 @@ class _ScopedEnv(Env):
             raise ValueError("Key cannot be empty")
 
         return _ScopedEnv(self, key)
-
-    @deprecated("Use / method for scoping")
-    def scoped(self, prefix: str) -> Env:
-        return _ScopedEnv(self, prefix)
 
     def get_string[T = str](  # type: ignore[override]
         self,
