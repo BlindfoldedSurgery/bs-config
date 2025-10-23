@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.0.0 (2025-10-23)
+
+### BREAKING CHANGE
+
+- Python 3.11 and 3.12 are no longer supported
+
+### Feat
+
+- introduce new scoping syntax
+- add transform parameter for Env.get_string_list()
+- add transform parameter for Env.get_string()
+
+
+- bump minimum Python version to 3.13
+
 ## v1.2.0 (2025-10-11)
 
 ### Feat
