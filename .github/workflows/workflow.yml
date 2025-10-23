@@ -30,6 +30,13 @@ jobs:
       build-tool: uv
       python-version: ${{ matrix.pyversion }}
 
+  lint-tests:
+    uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v6
+    with:
+      build-tool: uv
+      context-path: "tests/"
+      python-version: "3.14"
+
   test:
     strategy:
       fail-fast: false
@@ -64,6 +71,7 @@ jobs:
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v4
     needs:
       - lint
+      - lint-tests
       - test
     secrets:
       GH_TOKEN: ${{ secrets.GH_PR_TOKEN }}
@@ -75,6 +83,7 @@ jobs:
     uses: BlindfoldedSurgery/actions-python/.github/workflows/publish-package.yml@v6
     needs:
       - lint
+      - lint-tests
       - test
     if: success() && startsWith(github.ref, 'refs/tags/v')
     with:
