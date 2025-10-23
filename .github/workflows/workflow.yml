@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pyversion: [ "3.11", "3.12", "3.13", "3.14" ]
+        pyversion: [ "3.13", "3.14" ]
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v6
     with:
       build-tool: uv
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pyversion: [ "3.11", "3.12", "3.13", "3.14" ]
+        pyversion: [ "3.13", "3.14" ]
     uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v6
     with:
       build-tool: uv
@@ -79,7 +79,7 @@ jobs:
     if: success() && startsWith(github.ref, 'refs/tags/v')
     with:
       build-tool: uv
-      python-version: '3.11'
+      python-version: '3.13'
       pypi-username: ${{ vars.PYPI_USERNAME }}
     secrets:
       pypi-password: ${{ secrets.PYPI_PASSWORD }}
