@@ -59,3 +59,9 @@ def test_scoped_get_int_list():
     env = Env.load_from_dict({"ab": "1,2,3"})
     scoped = env.scoped("a")
     assert scoped.get_int_list("b") == [1, 2, 3]
+
+
+def test_get_transformed_value():
+    env = Env.load_from_dict({"ab": "1"})
+    integer = env.scoped("a").get_string("b", transform=int)
+    assert integer == 1
