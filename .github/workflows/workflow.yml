@@ -46,7 +46,7 @@ jobs:
     with:
       build-tool: uv
       python-version: ${{ matrix.pyversion }}
-      submit-coverage: ${{ matrix.pyversion == '3.11' }}
+      submit-coverage: ${{ matrix.pyversion == '3.14' }}
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
