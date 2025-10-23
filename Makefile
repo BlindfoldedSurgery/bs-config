@@ -5,7 +5,7 @@ check: lint test
 lint:
 	uv run ruff format
 	uv run ruff check --fix --show-fixes
-	uv run mypy -m bs_config -m tests
+	uv run mypy src/ tests/
 
 .PHONY: pre-commit
 pre-commit:

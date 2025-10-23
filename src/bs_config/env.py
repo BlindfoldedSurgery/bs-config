@@ -383,7 +383,7 @@ class _BaseEnv(Env):
 
         return _ScopedEnv(self, prefix)
 
-    def get_string[T = str](
+    def get_string[T = str](  # type: ignore[override]
         self,
         key: str,
         *,
@@ -399,11 +399,11 @@ class _BaseEnv(Env):
             return default
 
         if transform is None:
-            return value
+            return value  # type: ignore[return-value]
 
         return transform(value)
 
-    def get_bool(
+    def get_bool(  # type: ignore[override]
         self,
         key: str,
         *,
@@ -415,7 +415,7 @@ class _BaseEnv(Env):
 
         return value in ("true", "True", "yes")
 
-    def get_int(
+    def get_int(  # type: ignore[override]
         self,
         key: str,
         *,
@@ -430,7 +430,7 @@ class _BaseEnv(Env):
 
         return int(value)
 
-    def get_string_list[T = str](
+    def get_string_list[T = str](  # type: ignore[override]
         self,
         key: str,
         *,
@@ -449,11 +449,11 @@ class _BaseEnv(Env):
             stripped for value in values.split(",") if (stripped := value.strip())
         )
         if transform is None:
-            return list(raw_values)
+            return list(raw_values)  # type: ignore[arg-type]
 
         return [transform(value) for value in raw_values]
 
-    def get_int_list(
+    def get_int_list(  # type: ignore[override]
         self,
         key: str,
         *,
@@ -496,7 +496,7 @@ class _ScopedEnv(Env):
     def scoped(self, prefix: str) -> Env:
         return _ScopedEnv(self, prefix)
 
-    def get_string[T = str](
+    def get_string[T = str](  # type: ignore[override]
         self,
         key: str,
         *,
@@ -511,7 +511,7 @@ class _ScopedEnv(Env):
             transform=transform,
         )
 
-    def get_bool(
+    def get_bool(  # type: ignore[override]
         self,
         key: str,
         *,
@@ -519,7 +519,7 @@ class _ScopedEnv(Env):
     ) -> bool:
         return self.parent.get_bool(f"{self.prefix}{key}", default=default)
 
-    def get_int(
+    def get_int(  # type: ignore[override]
         self,
         key: str,
         *,
@@ -528,11 +528,11 @@ class _ScopedEnv(Env):
     ) -> int | None:
         return self.parent.get_int(
             f"{self.prefix}{key}",
-            default=default,
+            default=default,  # type: ignore[arg-type]
             required=required,
         )
 
-    def get_string_list[T = str](
+    def get_string_list[T = str](  # type: ignore[override]
         self,
         key: str,
         *,
@@ -542,12 +542,12 @@ class _ScopedEnv(Env):
     ) -> list[T] | None:
         return self.parent.get_string_list(
             f"{self.prefix}{key}",
-            default=default,
+            default=default,  # type: ignore[arg-type]
             required=required,
             transform=transform,
         )
 
-    def get_int_list(
+    def get_int_list(  # type: ignore[override]
         self,
         key: str,
         *,
@@ -556,6 +556,6 @@ class _ScopedEnv(Env):
     ) -> list[int] | None:
         return self.parent.get_int_list(
             f"{self.prefix}{key}",
-            default=default,
+            default=default,  # type: ignore[arg-type]
             required=required,
         )
