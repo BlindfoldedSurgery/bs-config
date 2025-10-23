@@ -22,6 +22,7 @@ jobs:
 
   lint:
     strategy:
+      fail-fast: false
       matrix:
         pyversion: [ "3.11", "3.12", "3.13", "3.14" ]
     uses: BlindfoldedSurgery/actions-python/.github/workflows/lint.yml@v5
@@ -31,6 +32,7 @@ jobs:
 
   test:
     strategy:
+      fail-fast: false
       matrix:
         pyversion: [ "3.11", "3.12", "3.13", "3.14" ]
     uses: BlindfoldedSurgery/actions-python/.github/workflows/test.yml@v5
