@@ -153,43 +153,47 @@ class Env(abc.ABC):
         pass
 
     @overload
-    def get_string_list(
+    def get_string_list[T = str](
         self,
         key: str,
         *,
-        default: list[str],
+        default: list[T],
         required: bool = False,
-    ) -> list[str]:
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T]:
         pass
 
     @overload
-    def get_string_list(
+    def get_string_list[T = str](
         self,
         key: str,
         *,
         default: None = None,
         required: Literal[False] = False,
-    ) -> list[str] | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T] | None:
         pass
 
     @overload
-    def get_string_list(
+    def get_string_list[T = str](
         self,
         key: str,
         *,
         default: None = None,
         required: Literal[True],
-    ) -> list[str]:
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T]:
         pass
 
     @abc.abstractmethod
-    def get_string_list(
+    def get_string_list[T = str](
         self,
         key: str,
         *,
-        default: list[str] | None = None,
+        default: list[T] | None = None,
         required: bool = False,
-    ) -> list[str] | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T] | None:
         """
         Gets a list of strings, splitting the original value by comma. For each value,
         the same rules as for ``get_string`` apply. Blank values are discarded.
@@ -202,6 +206,7 @@ class Env(abc.ABC):
             key: the key to look up
             default: a default value, defaults to None
             required: if True, a ValueError is raised instead of returning None
+            transform: a function to transform each list item
 
         Returns:
             a list of strings parsed from the value, or the default value
@@ -404,13 +409,14 @@ class _BaseEnv(Env):
 
         return int(value)
 
-    def get_string_list(
+    def get_string_list[T = str](
         self,
         key: str,
         *,
-        default: list[str] | None = None,
+        default: list[T] | None = None,
         required: bool = False,
-    ) -> list[str] | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T] | None:
         values = self._get_stripped_value(key)
 
         if values is None:
@@ -418,7 +424,13 @@ class _BaseEnv(Env):
                 raise ValueError(f"Missing config value for {key}")
             return default
 
-        return [stripped for value in values.split(",") if (stripped := value.strip())]
+        raw_values = (
+            stripped for value in values.split(",") if (stripped := value.strip())
+        )
+        if transform is None:
+            return list(raw_values)
+
+        return [transform(value) for value in raw_values]
 
     def get_int_list(
         self,
@@ -492,17 +504,19 @@ class _ScopedEnv(Env):
             required=required,
         )
 
-    def get_string_list(
+    def get_string_list[T = str](
         self,
         key: str,
         *,
-        default: list[str] | None = None,
+        default: list[T] | None = None,
         required: bool = False,
-    ) -> list[str] | None:
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T] | None:
         return self.parent.get_string_list(
             f"{self.prefix}{key}",
             default=default,
             required=required,
+            transform=transform,
         )
 
     def get_int_list(

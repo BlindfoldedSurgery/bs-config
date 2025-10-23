@@ -285,3 +285,24 @@ def test_get_string_transform_not_called_with_none(env, mocker):
     value = env.get_string("invalid", transform=mock)
     assert value is None
     mock.assert_not_called()
+
+
+def test_get_string_list_transformed_value():
+    env = Env.load_from_dict({"foo": "1,2,3"})
+    integers = env.get_string_list("foo", transform=int)
+    assert integers == [1, 2, 3]
+
+
+def test_get_string_list_transformed_value__default(env, mocker):
+    mock = mocker.Mock()
+    default = [_Stub()]
+    value = env.get_string_list("invalid", transform=mock, default=default)
+    assert value is default
+    mock.assert_not_called()
+
+
+def test_get_string_list_transform_not_called_with_none(env, mocker):
+    mock = mocker.Mock()
+    value = env.get_string_list("invalid", transform=mock)
+    assert value is None
+    mock.assert_not_called()
