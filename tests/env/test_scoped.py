@@ -13,6 +13,11 @@ def env() -> Env:
     )
 
 
+def test_scoped_div(env):
+    scoped = env / "ALPHA"
+    assert scoped.get_string("BETA_GAMMA") == "abc"
+
+
 def test_empty_prefix_scope(env):
     scoped = env.scoped("")
     assert scoped is env
