@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from typing import TYPE_CHECKING, Literal, cast, overload
+from warnings import deprecated
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -9,6 +10,19 @@ if TYPE_CHECKING:
 
 class Env(abc.ABC):
     @abc.abstractmethod
+    def __truediv__(self, key: str, /) -> Env:
+        """
+        Args:
+            key: a key to limit the scope to (only one layer at a time)
+
+        Returns:
+            an instance that is scoped to the given key
+
+        """
+        pass
+
+    @abc.abstractmethod
+    @deprecated("Use the / method for scoping")
     def scoped(self, prefix: str) -> Env:
         """
         Args:
@@ -356,6 +370,13 @@ class _BaseEnv(Env):
 
         return value
 
+    def __truediv__(self, key: str, /) -> Env:
+        if not key:
+            raise ValueError("Key cannot be empty")
+
+        return _ScopedEnv(self, f"{key}_")
+
+    @deprecated("Use / method for scoping")
     def scoped(self, prefix: str) -> Env:
         if not prefix:
             return self
@@ -465,6 +486,13 @@ class _ScopedEnv(Env):
         self.parent = parent
         self.prefix = prefix
 
+    def __truediv__(self, key: str, /) -> Env:
+        if not key:
+            raise ValueError("Key cannot be empty")
+
+        return _ScopedEnv(self, f"{key}_")
+
+    @deprecated("Use / method for scoping")
     def scoped(self, prefix: str) -> Env:
         return _ScopedEnv(self, prefix)
 
