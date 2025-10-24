@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Literal, cast, overload
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from datetime import date, datetime, time
 
 import logging
 
@@ -272,6 +273,191 @@ class Env(abc.ABC):
 
         Returns:
             a list of ints parsed from the value, or the default value
+        """
+        pass
+
+    @overload
+    def get_datetime(
+        self,
+        key: str,
+        *,
+        default: datetime,
+        required: bool = False,
+        is_naive: bool = False,
+    ) -> datetime:
+        pass
+
+    @overload
+    def get_datetime(
+        self,
+        key: str,
+        *,
+        default: datetime | None = None,
+        required: Literal[False] = False,
+        is_naive: bool = False,
+    ) -> datetime | None:
+        pass
+
+    @overload
+    def get_datetime(
+        self,
+        key: str,
+        *,
+        default: datetime | None = None,
+        required: Literal[True],
+        is_naive: bool = False,
+    ) -> datetime:
+        pass
+
+    @abc.abstractmethod
+    def get_datetime(
+        self,
+        key: str,
+        *,
+        default: datetime | None = None,
+        required: bool = False,
+        is_naive: bool = False,
+    ) -> datetime | None:
+        """
+        Get a datetime value.
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+            is_naive: if True, a timezone-naive datetime is expected, otherwise
+               a timezone-aware datetime is expected
+
+        Returns:
+            The requested value, or the default value
+
+        Raises:
+            ValueError:
+                1. If the value is not a valid ISO8601 datetime.
+
+                2. If the datetime is timezone-naive but is_naive is False, or the
+                other way around.
+
+                3. The supplied default value does not match the is_naive argument.
+
+                3. If the value is missing,
+                the default is None, and required is True.
+        """
+        pass
+
+    @overload
+    def get_date(
+        self,
+        key: str,
+        *,
+        default: date,
+        required: bool = False,
+    ) -> date:
+        pass
+
+    @overload
+    def get_date(
+        self,
+        key: str,
+        *,
+        default: date | None = None,
+        required: Literal[False] = False,
+    ) -> date | None:
+        pass
+
+    @overload
+    def get_date(
+        self,
+        key: str,
+        *,
+        default: date | None = None,
+        required: Literal[True],
+    ) -> date:
+        pass
+
+    @abc.abstractmethod
+    def get_date(
+        self,
+        key: str,
+        *,
+        default: date | None = None,
+        required: bool = False,
+    ) -> date | None:
+        """
+        Get a date value.
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            The requested value, or the default value
+
+        Raises:
+            ValueError:
+                1. If the value is not a valid ISO8601 date.
+                2. If the value is missing,
+                the default is None, and required is True.
+        """
+        pass
+
+    @overload
+    def get_time(
+        self,
+        key: str,
+        *,
+        default: time,
+        required: bool = False,
+    ) -> time:
+        pass
+
+    @overload
+    def get_time(
+        self,
+        key: str,
+        *,
+        default: time | None = None,
+        required: Literal[False] = False,
+    ) -> time | None:
+        pass
+
+    @overload
+    def get_time(
+        self,
+        key: str,
+        *,
+        default: time | None = None,
+        required: Literal[True],
+    ) -> time:
+        pass
+
+    @abc.abstractmethod
+    def get_time(
+        self,
+        key: str,
+        *,
+        default: time | None = None,
+        required: bool = False,
+    ) -> time | None:
+        """
+        Get a time value.
+
+        Args:
+            key: the key to look up
+            default: a default value, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            The requested value, or the default value
+
+        Raises:
+            ValueError:
+                1. If the value is not a valid ISO8601 time.
+                2. If the time is timezone-aware.
+                3. If the default value is timezone-aware.
+                4. If the value is missing,
+                the default is None, and required is True.
         """
         pass
 

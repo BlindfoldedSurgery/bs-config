@@ -1,3 +1,5 @@
+from datetime import UTC, date, datetime, time, timedelta, timezone
+
 import pytest
 
 from bs_config.env import Env
@@ -11,6 +13,15 @@ def env() -> Env:
             "STRING_TRAILING": " abc ",
             "INT": "42",
             "INT_TRAILING": " 42 ",
+            "DATE": "1970-01-01",
+            "DATE_TRAILING": " 1970-01-01 ",
+            "DATETIME_UTC": "1970-01-01T12:34:56Z",
+            "DATETIME_TRAILING": " 1970-01-01T12:34:56Z ",
+            "DATETIME_AWARE": "1970-01-01T12:34:56+02:30",
+            "DATETIME_NAIVE": "1970-01-01T12:34:56",
+            "TIME": "12:34",
+            "TIME_TRAILING": " 12:34 ",
+            "TIME_SECONDS": "12:34:56",
             "EMPTY": "",
             "BLANK": "  ",
         }
@@ -301,3 +312,206 @@ def test_get_string_list_transform_not_called_with_none(env, mocker):
     value = env.get_string_list("invalid", transform=mock)
     assert value is None
     mock.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "key",
+    ["date", "date-trailing"],
+)
+def test_get_date_value(env, key):
+    value = env.get_date(key)
+    assert value == date(1970, 1, 1)
+
+
+def test_get_invalid_date(env):
+    with pytest.raises(ValueError):
+        env.get_date("string")
+
+
+@pytest.mark.parametrize(
+    "default",
+    [
+        None,
+        date(2000, 1, 1),
+    ],
+)
+def test_get_date_value_default(env, default):
+    value = env.get_date("missing", default=default)
+    assert value == default
+
+
+def test_get_date_value_required_with_default(env):
+    value = env.get_date(
+        "missing",
+        default=date(2000, 1, 1),
+        required=True,
+    )
+    assert value == date(2000, 1, 1)
+
+
+def test_get_date_value_required_no_default(env):
+    with pytest.raises(ValueError, match="missing-key"):
+        env.get_date("missing-key", default=None, required=True)
+
+
+@pytest.mark.parametrize(
+    "key,expected",
+    [
+        ("time", time(12, 34)),
+        ("time-trailing", time(12, 34)),
+        ("time-seconds", time(12, 34, 56)),
+    ],
+)
+def test_get_time_value(env, key, expected):
+    value = env.get_time(key)
+    assert value == expected
+
+
+def test_get_invalid_time(env):
+    with pytest.raises(ValueError):
+        env.get_time("string")
+
+
+def test_get_time_tz_aware():
+    env = Env.load_from_dict({"TZ_TIME": "12:34:56+01:00"})
+    with pytest.raises(ValueError):
+        env.get_time("tz-time")
+
+
+@pytest.mark.parametrize(
+    "default",
+    [
+        None,
+        time(12, 34),
+    ],
+)
+def test_get_time_value_default(env, default):
+    value = env.get_time("missing", default=default)
+    assert value == default
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "missing",
+        "time",
+    ],
+)
+def get_time_value_default_aware(env, key):
+    with pytest.raises(ValueError):
+        env.get_time(
+            key,
+            default=time(12, 34, 56, tzinfo=UTC),
+        )
+
+
+def test_get_time_required_with_default(env):
+    value = env.get_time(
+        "missing",
+        default=time(12, 34),
+        required=True,
+    )
+    assert value == time(12, 34)
+
+
+def test_get_time_value_required_no_default(env):
+    with pytest.raises(ValueError, match="missing-key"):
+        env.get_time("missing-key", default=None, required=True)
+
+
+@pytest.mark.parametrize(
+    "key,expected",
+    [
+        ("datetime-utc", datetime(1970, 1, 1, 12, 34, 56, tzinfo=UTC)),
+        ("datetime-trailing", datetime(1970, 1, 1, 12, 34, 56, tzinfo=UTC)),
+        (
+            "datetime-aware",
+            datetime(
+                1970, 1, 1, 12, 34, 56, tzinfo=timezone(timedelta(hours=2, minutes=30))
+            ),
+        ),
+        ("datetime-naive", datetime(1970, 1, 1, 12, 34, 56)),
+    ],
+)
+def test_get_datetime_value(env, key, expected):
+    value = env.get_datetime(
+        key,
+        is_naive=expected.tzinfo is None,
+    )
+    assert value == expected
+    assert value.tzinfo == expected.tzinfo
+
+
+def test_get_invalid_datetime(env):
+    with pytest.raises(ValueError):
+        env.get_datetime("string")
+
+
+@pytest.mark.parametrize(
+    "value,is_naive",
+    [
+        ("1970-01-01T00:00:00Z", True),
+        ("1970-01-01T00:00:00+00:00", True),
+        ("1970-01-01T00:00:00+01:00", True),
+        ("1970-01-01T00:00:00", False),
+    ],
+)
+def test_get_datetime_tz_aware(value, is_naive):
+    env = Env.load_from_dict({"DATETIME": value})
+    with pytest.raises(ValueError):
+        env.get_datetime("datetime", is_naive=is_naive)
+
+
+@pytest.mark.parametrize(
+    "default",
+    [
+        None,
+        datetime(1970, 1, 1, 12, 34, tzinfo=UTC),
+    ],
+)
+def test_get_datetime_value_default_aware(env, default):
+    value = env.get_datetime("missing", default=default, is_naive=False)
+    assert value == default
+
+
+@pytest.mark.parametrize(
+    "default",
+    [
+        None,
+        datetime(1970, 1, 1, 12, 34),
+    ],
+)
+def test_get_datetime_value_default_naive(env, default):
+    value = env.get_datetime("missing", default=default, is_naive=True)
+    assert value == default
+
+
+@pytest.mark.parametrize(
+    "key,default",
+    [
+        ("missing", datetime(1970, 1, 1, 12, 34)),
+        ("missing", datetime(1970, 1, 1, 12, 34, tzinfo=UTC)),
+    ],
+)
+def test_get_datetime_value_default_naive_mismatch(env, key, default):
+    with pytest.raises(ValueError):
+        default_is_naive = default.tzinfo is None
+        env.get_datetime(
+            key,
+            default=default,
+            is_naive=not default_is_naive,
+        )
+
+
+def test_get_datetime_required_with_default(env):
+    value = env.get_datetime(
+        "missing",
+        default=datetime(1970, 1, 1, 12, 34, tzinfo=UTC),
+        required=True,
+    )
+    assert value == datetime(1970, 1, 1, 12, 34, tzinfo=UTC)
+
+
+def test_get_datetime_value_required_no_default(env):
+    with pytest.raises(ValueError, match="missing-key"):
+        env.get_datetime("missing-key", default=None, required=True)
