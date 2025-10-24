@@ -1,0 +1,39 @@
+does-this = "work"
+
+[top]
+string = "foo"
+string-whitespace = " foo "
+string-blank = "  "
+bool = true
+int = 123
+float = 13.4
+
+list-strings = [
+    "foo",
+    "bar",
+]
+list-empty = []
+list-ints = [1, 2, 3]
+list-floats = [ 1.1, 1.2, 1.3 ]
+list-bools = [ true, false ]
+list-mix = [
+    1,
+    "foo",
+]
+list-nested = [[1,2,3]]
+datetime-naive = 1979-05-27T07:32:00
+datetime-aware = 1979-05-27T07:32:00Z
+datetime-offset = 1979-05-27T07:32:00+01:00
+date = 1979-05-27
+time = 06:32:00
+
+dict = { key = "value", foo = 1 }
+
+[[items]]
+x = "y"
+
+[[items]]
+y = "z"
+
+[top.nested]
+foo = "nested"
