@@ -4,8 +4,9 @@ import abc
 from typing import TYPE_CHECKING, Literal, cast, overload
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
     from datetime import date, datetime, time
+    from pathlib import Path
 
 import logging
 
@@ -467,12 +468,14 @@ class Env(abc.ABC):
         *,
         include_env: bool = True,
         include_default_dotenv: bool = False,
-        additional_dotenvs: list[str] | None = None,
+        additional_dotenvs: Iterable[str] | None = None,
+        toml_configs: Iterable[Path] | None = None,
     ) -> Env:
         """
         Loads an Env instance.
 
-        Precedence (highest to lowest): ``os.environ``, ``additional_dotenvs``, ``.env``
+        Precedence (highest to lowest): ``os.environ``, ``additional_dotenvs``,
+            ``.env``, ``toml_configs``
 
         **Warning**: To use dotenv functionality, you must install the dotenv extra.
 
@@ -482,13 +485,27 @@ class Env(abc.ABC):
             additional_dotenvs: a list of other ``.env`` files to include. This should
                 just be the prefix, so "test" for "test.env". Ascending precedence (last
                 one wins a conflict).
+            toml_configs: a list of ``.toml`` files to include. It's not an error if
+                the files do not exist. Keys in TOML should be kebab-case and will be
+                normalized to screaming snake case.
+                Ascending precedence (last one wins a conflict).
         """
         from ._implementation.default import DefaultEnv
         from ._implementation.direnv import DirenvEnv
+        from ._implementation.toml import TomlEnv
 
+        result: Env = DefaultEnv()
+
+        if toml_configs is not None:
+            for toml_config in toml_configs:
+                toml_env = TomlEnv.load_toml_config(result, toml_config)
+                if toml_env is not None:
+                    result = toml_env
+
+        # TODO: move logic below to DirEnv class
         values = {}
 
-        if include_default_dotenv or additional_dotenvs:
+        if include_default_dotenv or additional_dotenvs is not None:
             try:
                 from dotenv import dotenv_values
             except ImportError as e:
@@ -509,7 +526,7 @@ class Env(abc.ABC):
             values.update(environ)
 
         return DirenvEnv(
-            DefaultEnv(),
+            result,
             cls._remove_none_values(values),
         )
 
