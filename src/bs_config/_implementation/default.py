@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import date, datetime, time
 
 from bs_config import Env
 
@@ -67,5 +68,50 @@ class DefaultEnv(Env):
     ) -> list[int] | None:
         if default is None and required:
             raise ValueError(f"Missing config value for {key}")
+
+        return default
+
+    def get_datetime(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: datetime | None = None,
+        required: bool = False,
+        is_naive: bool = False,
+    ) -> datetime | None:
+        if default is None and required:
+            raise ValueError(f"Missing config value for {key}")
+
+        if default is not None and ((default.tzinfo is None) != is_naive):
+            raise ValueError(
+                f"Default value timezone-awareness not as expected for key {key}"
+            )
+
+        return default
+
+    def get_date(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: date | None = None,
+        required: bool = False,
+    ) -> date | None:
+        if default is None and required:
+            raise ValueError(f"Missing config value for {key}")
+
+        return default
+
+    def get_time(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: time | None = None,
+        required: bool = False,
+    ) -> time | None:
+        if default is None and required:
+            raise ValueError(f"Missing config value for {key}")
+
+        if default is not None and default.tzinfo is not None:
+            raise ValueError(f"Default value is timezone-aware for {key}")
 
         return default

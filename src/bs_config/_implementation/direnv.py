@@ -1,5 +1,6 @@
 import warnings
 from collections.abc import Callable
+from datetime import date, datetime, time
 
 from bs_config import Env
 
@@ -141,5 +142,87 @@ class DirenvEnv(Env):
                 result.append(int(stripped))
             except ValueError:
                 raise ValueError(f"Invalid integer for key {key}: '{value}'")
+
+        return result
+
+    def get_datetime(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: datetime | None = None,
+        required: bool = False,
+        is_naive: bool = False,
+    ) -> datetime | None:
+        value = self._get_stripped_value(key)
+        if value is None:
+            return self.__parent.get_datetime(
+                key,
+                default=default,  # type: ignore[arg-type]
+                required=required,
+                is_naive=is_naive,
+            )
+
+        try:
+            result = datetime.fromisoformat(value)
+        except ValueError:
+            raise ValueError(f"Invalid datetime for key {key}: '{value}'")
+
+        if result.tzinfo is None:
+            if is_naive:
+                return result
+
+            raise ValueError(
+                "Received timezone-aware datetime value, but a naive datetime was expected"
+            )
+        else:
+            if not is_naive:
+                return result
+
+            raise ValueError(
+                "Received timezone-naive datetime value, but a timezone-aware datetime was expected"
+            )
+
+    def get_date(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: date | None = None,
+        required: bool = False,
+    ) -> date | None:
+        value = self._get_stripped_value(key)
+        if value is None:
+            return self.__parent.get_date(
+                key,
+                default=default,  # type: ignore[arg-type]
+                required=required,
+            )
+
+        try:
+            return date.fromisoformat(value)
+        except ValueError:
+            raise ValueError(f"Invalid date for key {key}: '{value}'")
+
+    def get_time(  # type: ignore[override]
+        self,
+        key: str,
+        *,
+        default: time | None = None,
+        required: bool = False,
+    ) -> time | None:
+        value = self._get_stripped_value(key)
+        if value is None:
+            return self.__parent.get_time(
+                key,
+                default=default,  # type: ignore[arg-type]
+                required=required,
+            )
+
+        try:
+            result = time.fromisoformat(value)
+        except ValueError:
+            raise ValueError(f"Invalid time for key {key}: '{value}'")
+
+        if result.tzinfo is not None:
+            raise ValueError(f"Receive timezone-aware time for key {key}")
 
         return result
