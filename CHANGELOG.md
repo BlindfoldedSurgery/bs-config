@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.1.0 (2025-10-24)
+
+### Feat
+
+- implement getters for times, dates and datetimes
+
 ## v3.0.0 (2025-10-23)
 
 ### BREAKING CHANGE
