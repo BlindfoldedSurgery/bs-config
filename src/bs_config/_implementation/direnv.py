@@ -10,7 +10,7 @@ from .scoped import ScopedEnv
 class DirenvEnv(Env):
     def __init__(self, parent: Env, values: dict[str, str]) -> None:
         self.__parent = parent
-        self._values = values
+        self.__values = values
 
     @staticmethod
     def _to_screaming_snake_case(s: str) -> str:
@@ -22,7 +22,7 @@ class DirenvEnv(Env):
 
         key_parts = key.split(".")
         full_key = "__".join(self._to_screaming_snake_case(part) for part in key_parts)
-        value = self._values.get(full_key)
+        value = self.__values.get(full_key)
 
         if value is None:
             return value
