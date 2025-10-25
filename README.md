@@ -8,6 +8,7 @@
 
 [codecov-image]: https://codecov.io/gh/BlindfoldedSurgery/bs-config/graph/badge.svg?token=GXR5GIAQ20
 [codecov-link]: https://codecov.io/gh/BlindfoldedSurgery/bs-config
+
 ## Usage
 
 This package provides an `Env` class for easy access and validation of configuration values from
