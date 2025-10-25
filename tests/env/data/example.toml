@@ -37,3 +37,12 @@ y = "z"
 
 [top.nested]
 foo = "nested"
+
+[top.duration]
+weeks = 1
+days = 2
+hours = 3
+minutes = 4
+seconds = 5
+milliseconds = 6
+microseconds = 107
