@@ -1,4 +1,3 @@
-import logging
 import tomllib
 import warnings
 from collections.abc import Callable
@@ -7,8 +6,6 @@ from pathlib import Path
 from typing import Any, Self, cast
 
 from bs_config import Env
-
-_logger = logging.getLogger(__name__)
 
 
 class TomlEnv(Env):
