@@ -16,7 +16,7 @@ classifiers = [
 [project.urls]
 changelog = "https://github.com/BlindfoldedSurgery/bs-config/blob/main/CHANGELOG.md"
 homepage = "https://github.com/BlindfoldedSurgery/bs-config"
-repository = "https://github.com/BlindfoldedSurgery/bs-config"
+source = "https://github.com/BlindfoldedSurgery/bs-config"
 
 [project.optional-dependencies]
 dotenv=[
