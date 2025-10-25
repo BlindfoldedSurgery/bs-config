@@ -10,9 +10,8 @@
 [codecov-link]: https://codecov.io/gh/BlindfoldedSurgery/bs-config
 ## Usage
 
-For now, this package provides the `Env` class for easy access and validation of configuration
-values from the environment. At its essence, it's just a wrapper around a `dict[str, str]` with
-some fancy wrappers and fancy typing.
+This package provides an `Env` class for easy access and validation of configuration values from
+the environment or TOML files.
 
 **Example**:
 
@@ -22,14 +21,36 @@ from bs_config import Env
 env = Env.load()
 
 # a: int | None (missing or blank values lead to the default None)
-a = env.get_int("MY_INT")
+a = env.get_int("my-int")
 
 # b: int (you specified a default, so it can't be None)
-b = env.get_int("MY_INT", default=42)
+b = env.get_int("my-iny", default=42)
 
 # c: int (if the value is missing, a ValueError is raised)
-c = env.get_int("MY_INT", required=True)
+c = env.get_int("my-int", required=True)
 ```
+
+### Nested Values
+
+You can access nested values by either separating keys with a dot, or using a scoped Env instance:
+
+```python
+from bs_config import Env
+
+env = Env.load()
+a = env.get_int("nested.my-int")
+
+nested_env = env / "nested"
+b = nested_env.get_int("my-int")
+
+assert a == b
+```
+
+### Key Translation
+
+For environment variables and Dotenv values, keys are translated to SCREAMING_SNAKE_CASE.
+Nested scopes are translated to a **double** underscore, so the key `nested-section.my-value` becomes
+`NESTED_SECTION__MY_VALUE`.
 
 ### Dotenv Support
 
@@ -46,7 +67,14 @@ env = Env.load(include_default_dotenv=True)
 env = Env.load(additional_dotenvs=["test", "dev"])
 ```
 
-## Future Plans
+### TOML Support
 
-A higher-level extension is planned. It will allow users to just define a typed Python class
-representing their config, which can then be automatically loaded.
+You can also load TOML config files into an Env instance. Note that given paths are allowed to not
+exist, and dotenv/env values take precedence.
+
+```python
+from bs_config import Env
+from pathlib import Path
+
+env = Env.load(toml_configs=[Path("/etc/myapp/config.toml")])
+```
