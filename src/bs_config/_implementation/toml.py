@@ -8,8 +8,6 @@ from typing import Any, Self, cast
 
 from bs_config import Env
 
-from .scoped import ScopedEnv
-
 _logger = logging.getLogger(__name__)
 
 
@@ -30,9 +28,6 @@ class TomlEnv(Env):
             raise ValueError(f"Could not decode TOML config at {toml_config}: %s", e)
 
         return cls(parent, content)
-
-    def __truediv__(self, key: str, /) -> Env:
-        return ScopedEnv(self, key)
 
     def _get_nested_value(self, key: str) -> Any | None:
         if key != key.lower():

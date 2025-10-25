@@ -4,8 +4,6 @@ from datetime import date, datetime, time
 
 from bs_config import Env
 
-from .scoped import ScopedEnv
-
 
 class DirenvEnv(Env):
     def __init__(self, parent: Env, values: dict[str, str]) -> None:
@@ -32,9 +30,6 @@ class DirenvEnv(Env):
             return None
 
         return value
-
-    def __truediv__(self, key: str, /) -> Env:
-        return ScopedEnv(self, key)
 
     def get_string[T = str](  # type: ignore[override]
         self,

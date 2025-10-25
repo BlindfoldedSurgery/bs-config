@@ -11,12 +11,6 @@ class ScopedEnv(Env):
         self.__parent = parent
         self.__prefix = prefix
 
-    def __truediv__(self, key: str, /) -> Env:
-        if not key:
-            raise ValueError("Key cannot be empty")
-
-        return ScopedEnv(self, key)
-
     def get_string[T = str](  # type: ignore[override]
         self,
         key: str,

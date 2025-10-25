@@ -3,15 +3,10 @@ from datetime import date, datetime, time
 
 from bs_config import Env
 
-from .scoped import ScopedEnv
-
 
 class DefaultEnv(Env):
     def __init(self) -> None:
         pass
-
-    def __truediv__(self, key: str, /) -> Env:
-        return ScopedEnv(self, key)
 
     def get_string[T = str](  # type: ignore[override]
         self,

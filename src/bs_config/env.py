@@ -15,7 +15,6 @@ _logger = logging.getLogger(__name__)
 
 
 class Env(abc.ABC):
-    @abc.abstractmethod
     def __truediv__(self, key: str, /) -> Env:
         """
         Args:
@@ -25,7 +24,12 @@ class Env(abc.ABC):
             an instance that is scoped to the given key
 
         """
-        pass
+        from ._implementation.scoped import ScopedEnv
+
+        if not key:
+            raise ValueError("Key cannot be empty")
+
+        return ScopedEnv(self, key)
 
     @overload
     def get_string[T = str](
