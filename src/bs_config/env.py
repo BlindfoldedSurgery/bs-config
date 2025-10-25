@@ -502,10 +502,7 @@ class Env(abc.ABC):
                 if toml_env is not None:
                     result = toml_env
 
-        # TODO: move logic below to DirEnv class
-        values = {}
-
-        if include_default_dotenv or additional_dotenvs is not None:
+        if include_default_dotenv or (additional_dotenvs is not None):
             try:
                 from dotenv import dotenv_values
             except ImportError as e:
@@ -514,21 +511,22 @@ class Env(abc.ABC):
                 ) from e
 
             if include_default_dotenv:
-                values.update(dotenv_values(".env"))
+                values = dotenv_values(".env")
+                if values:
+                    result = DirenvEnv(result, cls._remove_none_values(values))
 
             if additional_dotenvs is not None:
                 for additional_dotenv in additional_dotenvs:
-                    values.update(dotenv_values(f"{additional_dotenv}.env"))
+                    values = dotenv_values(f"{additional_dotenv}.env")
+                    if values:
+                        result = DirenvEnv(result, cls._remove_none_values(values))
 
         if include_env:
             from os import environ
 
-            values.update(environ)
+            result = DirenvEnv(result, cls._remove_none_values(dict(environ)))
 
-        return DirenvEnv(
-            result,
-            cls._remove_none_values(values),
-        )
+        return result
 
     @classmethod
     def load_from_dict(
