@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.1 (2025-10-25)
+
+### Fix
+
+- add missing overloads to allow dynamic requirement
+
 ## v3.2.0 (2025-10-25)
 
 ### Feat
