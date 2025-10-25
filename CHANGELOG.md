@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.0 (2025-10-25)
+
+### Feat
+
+- add support for TOML config files
+
 ## v3.1.0 (2025-10-24)
 
 ### Feat
