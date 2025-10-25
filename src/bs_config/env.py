@@ -656,6 +656,7 @@ class Env(abc.ABC):
         include_default_dotenv: bool = False,
         additional_dotenvs: Iterable[str] | None = None,
         toml_configs: Iterable[Path] | None = None,
+        fallback: Env | None = None,
     ) -> Env:
         """
         Loads an Env instance.
@@ -675,12 +676,18 @@ class Env(abc.ABC):
                 the files do not exist. Keys in TOML should be kebab-case and will be
                 normalized to screaming snake case.
                 Ascending precedence (last one wins a conflict).
+            fallback: an existing Env instance that will be used if a key is not present
+                in the Env being created.
         """
         from ._implementation.default import DefaultEnv
         from ._implementation.direnv import DirenvEnv
         from ._implementation.toml import TomlEnv
 
-        result: Env = DefaultEnv()
+        result: Env
+        if fallback is None:
+            result = DefaultEnv()
+        else:
+            result = fallback
 
         if toml_configs is not None:
             for toml_config in toml_configs:
