@@ -59,6 +59,17 @@ class Env(abc.ABC):
     ) -> T:
         pass
 
+    @overload
+    def get_string[T = str](
+        self,
+        key: str,
+        *,
+        default: T | None = None,
+        required: bool = False,
+        transform: Callable[[str], T] | None = None,
+    ) -> T | None:
+        pass
+
     @abc.abstractmethod
     def get_string[T = str](
         self,
@@ -134,6 +145,16 @@ class Env(abc.ABC):
     ) -> int:
         pass
 
+    @overload
+    def get_int(
+        self,
+        key: str,
+        *,
+        default: int | None = None,
+        required: bool = False,
+    ) -> int | None:
+        pass
+
     @abc.abstractmethod
     def get_int(
         self,
@@ -190,6 +211,17 @@ class Env(abc.ABC):
         required: Literal[True],
         transform: Callable[[str], T] | None = None,
     ) -> list[T]:
+        pass
+
+    @overload
+    def get_string_list[T = str](
+        self,
+        key: str,
+        *,
+        default: list[T] | None = None,
+        required: bool = False,
+        transform: Callable[[str], T] | None = None,
+    ) -> list[T] | None:
         pass
 
     @abc.abstractmethod
@@ -251,6 +283,16 @@ class Env(abc.ABC):
     ) -> list[int]:
         pass
 
+    @overload
+    def get_int_list(
+        self,
+        key: str,
+        *,
+        default: list[int] | None = None,
+        required: bool = False,
+    ) -> list[int] | None:
+        pass
+
     @abc.abstractmethod
     def get_int_list(
         self,
@@ -308,6 +350,17 @@ class Env(abc.ABC):
         required: Literal[True],
         is_naive: bool = False,
     ) -> datetime:
+        pass
+
+    @overload
+    def get_datetime(
+        self,
+        key: str,
+        *,
+        default: datetime | None = None,
+        required: bool = False,
+        is_naive: bool = False,
+    ) -> datetime | None:
         pass
 
     @abc.abstractmethod
@@ -376,6 +429,16 @@ class Env(abc.ABC):
     ) -> date:
         pass
 
+    @overload
+    def get_date(
+        self,
+        key: str,
+        *,
+        default: date | None = None,
+        required: bool = False,
+    ) -> date | None:
+        pass
+
     @abc.abstractmethod
     def get_date(
         self,
@@ -431,6 +494,16 @@ class Env(abc.ABC):
         default: time | None = None,
         required: Literal[True],
     ) -> time:
+        pass
+
+    @overload
+    def get_time(
+        self,
+        key: str,
+        *,
+        default: time | None = None,
+        required: bool = False,
+    ) -> time | None:
         pass
 
     @abc.abstractmethod
