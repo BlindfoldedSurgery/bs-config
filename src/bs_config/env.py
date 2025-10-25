@@ -8,10 +8,7 @@ if TYPE_CHECKING:
     from datetime import date, datetime, time
     from pathlib import Path
 
-import logging
 from datetime import timedelta
-
-_logger = logging.getLogger(__name__)
 
 
 class Env(abc.ABC):
