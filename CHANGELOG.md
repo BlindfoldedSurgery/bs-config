@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.0 (2025-10-25)
+
+### Feat
+
+- implement Env.get_duration()
+
 ## v3.2.1 (2025-10-25)
 
 ### Fix
