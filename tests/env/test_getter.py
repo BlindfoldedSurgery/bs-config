@@ -515,3 +515,82 @@ def test_get_datetime_required_with_default(env):
 def test_get_datetime_value_required_no_default(env):
     with pytest.raises(ValueError, match="missing-key"):
         env.get_datetime("missing-key", default=None, required=True)
+
+
+def test_get_duration_unset_required():
+    env = Env.load_from_dict({})
+    with pytest.raises(ValueError):
+        env.get_duration("missing", required=True)
+
+
+def test_get_duration_unset_not_required():
+    env = Env.load_from_dict({})
+    value = env.get_duration("missing")
+    assert value is None
+
+
+def test_get_duration_unset_default():
+    env = Env.load_from_dict({})
+    default = timedelta(hours=1)
+    value = env.get_duration("missing", default=default)
+    assert value is default
+
+
+def test_get_duration_blank_default():
+    env = Env.load_from_dict({"TIME__SECONDS": "  "})
+    default = timedelta(hours=1)
+    value = env.get_duration("time", default=default)
+    assert value is default
+
+
+@pytest.mark.parametrize(
+    "seconds",
+    [
+        20,
+        0,
+    ],
+)
+def test_get_duration_partially_set(seconds):
+    env = Env.load_from_dict({"TIME__SECONDS": str(seconds)})
+    value = env.get_duration("time", required=True)
+    assert value == timedelta(seconds=seconds)
+
+
+def test_get_duration_fully_set():
+    env = Env.load_from_dict(
+        {
+            "TIME__WEEKS": "1",
+            "TIME__DAYS": "2",
+            "TIME__HOURS": "3",
+            "TIME__MINUTES": "4",
+            "TIME__SECONDS": "5",
+            "TIME__MILLISECONDS": "6",
+            "TIME__MICROSECONDS": "107",
+        }
+    )
+    value = env.get_duration("time", required=True)
+    assert value == timedelta(
+        weeks=1,
+        days=2,
+        hours=3,
+        minutes=4,
+        seconds=5,
+        milliseconds=6,
+        microseconds=107,
+    )
+
+
+def test_get_duration_fully_set_all_zero():
+    env = Env.load_from_dict(
+        {
+            "TIME__WEEKS": "0",
+            "TIME__DAYS": "0",
+            "TIME__HOURS": "0",
+            "TIME__MINUTES": "0",
+            "TIME__SECONDS": "0",
+            "TIME__MILLISECONDS": "0",
+            "TIME__MICROSECONDS": "0",
+        }
+    )
+    value = env.get_duration("time", required=True)
+    assert value == timedelta()

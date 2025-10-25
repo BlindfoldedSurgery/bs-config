@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 import logging
+from datetime import timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -534,6 +535,117 @@ class Env(abc.ABC):
                 the default is None, and required is True.
         """
         pass
+
+    @overload
+    def get_duration(
+        self,
+        key: str,
+        *,
+        default: timedelta,
+        required: bool = False,
+    ) -> timedelta:
+        pass
+
+    @overload
+    def get_duration(
+        self,
+        key: str,
+        *,
+        default: timedelta | None = None,
+        required: Literal[True],
+    ) -> timedelta:
+        pass
+
+    @overload
+    def get_duration(
+        self,
+        key: str,
+        *,
+        default: timedelta | None = None,
+        required: Literal[False] = False,
+    ) -> timedelta | None:
+        pass
+
+    @overload
+    def get_duration(
+        self,
+        key: str,
+        *,
+        default: timedelta | None = None,
+        required: bool = False,
+    ) -> timedelta | None:
+        pass
+
+    def get_duration(
+        self,
+        key: str,
+        *,
+        default: timedelta | None = None,
+        required: bool = False,
+    ) -> timedelta | None:
+        """
+        Get a duration value (as timedelta). If the underlying format (like env or TOML)
+        doesn't have a native way to represent a duration, the key serves as a scope and
+        the parts of timedelta are looked up within that scope.
+
+        So if you look up the key "my-duration", it's roughly the equivalent of::
+
+            scoped = env / "my-duration"
+            return timedelta(
+                weeks=scoped.get_int("weeks", default=0),
+                days=scoped.get_int("days", default=0),
+                hours=scoped.get_int("hours", default=0),
+                minutes=scoped.get_int("minutes", default=0),
+                seconds=scoped.get_int("seconds", default=0),
+                milliseconds=scoped.get_int("milliseconds", default=0),
+                microseconds=scoped.get_int("microseconds", default=0)
+            )
+
+        Args:
+            key: the key to look up
+            default: a default value in case none of the timedelta fields were
+                explicitly set, defaults to None
+            required: if True, a ValueError is raised instead of returning None
+
+        Returns:
+            The requested value, or the default value
+
+        Raises:
+            ValueError:
+                1. Any supplied value was not a valid int
+                2. No subfield was set, no default was given, but required is True
+        """
+        scoped = self / key
+
+        # First get all parts as optional to allow us to differentiate 0 and None
+        weeks = scoped.get_int("weeks")
+        days = scoped.get_int("days")
+        hours = scoped.get_int("hours")
+        minutes = scoped.get_int("minutes")
+        seconds = scoped.get_int("seconds")
+        milliseconds = scoped.get_int("milliseconds")
+        microseconds = scoped.get_int("microseconds")
+
+        is_unset = all(
+            v is None
+            for v in [weeks, days, hours, minutes, seconds, milliseconds, microseconds]
+        )
+
+        if is_unset:
+            if required and default is None:
+                raise ValueError(f"Missing duration under scope-key {key}")
+
+            return default
+
+        return timedelta(
+            weeks=weeks or 0,
+            days=days or 0,
+            hours=hours or 0,
+            minutes=minutes or 0,
+            seconds=seconds or 0,
+            milliseconds=milliseconds or 0,
+            microseconds=microseconds or 0,
+        )
 
     @classmethod
     def load(

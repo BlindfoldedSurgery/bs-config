@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
 
 import pytest
@@ -216,3 +216,16 @@ def test_string_stripped_transform(example_env) -> None:
 def test_string_defaults_if_blank(example_env):
     value = example_env.get_string("top.string-blank", default="foo")
     assert value == "foo"
+
+
+def test_get_duration(example_env):
+    value = example_env.get_duration("top.duration")
+    assert value == timedelta(
+        weeks=1,
+        days=2,
+        hours=3,
+        minutes=4,
+        seconds=5,
+        milliseconds=6,
+        microseconds=107,
+    )
