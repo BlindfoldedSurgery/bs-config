@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.4.0 (2025-10-25)
+
+### Feat
+
+- allow stacking envs
+
 ## v3.3.0 (2025-10-25)
 
 ### Feat
