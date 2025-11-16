@@ -6,6 +6,9 @@ on:
       - v**
   pull_request: { }
 
+permissions:
+  contents: read
+
 jobs:
   required-meta:
     permissions:
@@ -15,6 +18,9 @@ jobs:
     uses: BlindfoldedSurgery/actions-meta/.github/workflows/required.yml@v2
 
   check-commits:
+    permissions:
+      contents: read
+      pull-requests: write
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-check.yml@v5
     with:
       build-tool: uv
@@ -69,6 +75,9 @@ jobs:
           fi
 
   bump:
+    permissions:
+      contents: write
+      pull-requests: write
     uses: BlindfoldedSurgery/actions-releases/.github/workflows/commitizen-bump.yml@v5
     needs:
       - lint
