@@ -25,7 +25,7 @@ dotenv=[
 
 [dependency-groups]
 dev = [
-    "commitizen==4.10.0",
+    "commitizen==4.10.1",
     "coverage[toml]==7.13.*",
     "mypy==1.19.*",
     "pre-commit==4.5.*",
